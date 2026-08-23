@@ -39,6 +39,7 @@
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
+    "@quotidianlabs/emojis-data": ">=0.1.0",
     "preact": "10.6.4"
   },
   "alias": {
