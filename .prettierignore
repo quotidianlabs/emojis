@@ -4,3 +4,4 @@
 **/dist
 **/sets
 coverage
+.release-gate
