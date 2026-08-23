@@ -1,5 +1,5 @@
 ---
-status: accepted
+status: proposed
 ---
 
 # Release via npm trusted publishing, staged through the `next` dist-tag
@@ -12,6 +12,8 @@ smoke test passes against the real registry. We are asking people to swap out a
 package they already trust, so provenance attestation and an unpublishable-mistake
 buffer are both worth more here than release convenience.
 
+This ADR stays `proposed` until the first release actually runs through it.
+
 ## Consequences
 
 - **The inherited Jest suite does not gate releases, because it cannot.** Five of
@@ -23,9 +25,11 @@ buffer are both worth more here than release convenience.
   `@quotidianlabs/emojis-data` until it exists on npm, so the CDN path in the core
   bundle is unverifiable from local tarballs. This is why `next` staging exists, and
   why data must be published before core.
-- The very first publish of each package was manual and token-authenticated. A
-  trusted publisher is configured on a package's npm settings page, which requires
-  the package to exist — OIDC cannot bootstrap itself.
-- Trusted publishing requires Node >= 22.14.0 while the build toolchain is pinned
-  much older, so the release workflow runs `setup-node` twice: one version to build,
-  another to publish.
+- The first publish of each package is manual and token-authenticated. A trusted
+  publisher is configured on a package's npm settings page, which requires the
+  package to exist, so OIDC cannot bootstrap itself.
+- Trusted publishing requires Node >= 22.14.0. Rather than run two Node versions,
+  the toolchain pin in `.node-version` moves from 16.13.0 to 22.23.2, which clears
+  that floor and produces byte-identical build output (verified against Node 26).
+  Build and publish therefore share one Node version and one `setup-node` step, and
+  `nodenv/actions/node-version` keeps working unchanged.
