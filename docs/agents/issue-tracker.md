@@ -4,8 +4,6 @@ Issues and specs for this repo live as GitHub issues. Use the `gh` CLI for all o
 
 Repo: `quotidianlabs/emojis` (a fork of `missive/emoji-mart`).
 
-> **Prerequisite**: GitHub Issues must be enabled on this fork (Settings → General → Features → Issues). Forks have it off by default, and every `gh issue` call below fails until it is on.
-
 ## Conventions
 
 - **Create an issue**: `gh issue create --title "..." --body "..."`. Use a heredoc for multi-line bodies.
