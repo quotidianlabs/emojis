@@ -1,5 +1,5 @@
 {
-  "name": "@emoji-mart/react",
+  "name": "@quotidianlabs/emojis-react",
   "version": "1.1.1",
   "description": "React wrapper for Emoji Mart; the emoji picker for the web.",
   "license": "MIT",
@@ -7,7 +7,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/missive/emoji-mart",
-    "directory": "packages/emoji-mart-react"
+    "directory": "packages/emojis-react"
   },
   "source": "react.tsx",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "prepublishOnly": "yarn build"
   },
   "peerDependencies": {
-    "emoji-mart": "^5.2",
+    "@quotidianlabs/emojis": "^5.2",
     "react": "^16.8 || ^17 || ^18"
   },
   "files": [

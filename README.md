@@ -26,12 +26,12 @@ Data required for the picker to work has been completely decoupled from the libr
 - **Cons:** Slower initial page load (bigger file to load)
 
 ```sh
-yarn add @emoji-mart/data
+yarn add @quotidianlabs/emojis-data
 ```
 
 ```js
-import data from '@emoji-mart/data'
-import { Picker } from 'emoji-mart'
+import data from '@quotidianlabs/emojis-data'
+import { Picker } from '@quotidianlabs/emojis'
 
 new Picker({ data })
 ```
@@ -41,11 +41,11 @@ new Picker({ data })
 - **Cons:** Network latency, doesn’t work offline (unless you configure a ServiceWorker)
 
 ```js
-import { Picker } from 'emoji-mart'
+import { Picker } from '@quotidianlabs/emojis'
 new Picker({
   data: async () => {
     const response = await fetch(
-      'https://cdn.jsdelivr.net/npm/@emoji-mart/data',
+      'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data',
     )
 
     return response.json()
@@ -58,12 +58,12 @@ In this example data is fetched from a content delivery network, but it could al
 ## 🏪 Picker
 ### React
 ```sh
-npm install --save emoji-mart @emoji-mart/data @emoji-mart/react
+npm install --save @quotidianlabs/emojis @quotidianlabs/emojis-data @quotidianlabs/emojis-react
 ```
 
 ```js
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
+import data from '@quotidianlabs/emojis-data'
+import Picker from '@quotidianlabs/emojis-react'
 
 function App() {
   return (
@@ -74,7 +74,7 @@ function App() {
 
 ### Browser
 ```html
-<script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis@latest/dist/browser.js"></script>
 <script>
   const pickerOptions = { onEmojiSelect: console.log }
   const picker = new EmojiMart.Picker(pickerOptions)
@@ -100,7 +100,7 @@ function App() {
 | **emojiButtonRadius** | `100%` | i.e. `6px`, `1em`, `100%` | The radius of the emoji buttons |
 | **emojiButtonSize** | `36` | | The size of the emoji buttons |
 | **emojiSize** | `24` | | The size of the emojis (inside the buttons) |
-| **emojiVersion** | `14` | `1`, `2`, `3`, `4`, `5`, `11`, `12`, `12.1`, `13`, `13.1`, `14` | The version of the emoji data to use. Latest version supported in `@emoji-mart/data` is currently [14](https://emojipedia.org/emoji-14.0) |
+| **emojiVersion** | `14` | `1`, `2`, `3`, `4`, `5`, `11`, `12`, `12.1`, `13`, `13.1`, `14` | The version of the emoji data to use. Latest version supported in `@quotidianlabs/emojis-data` is currently [14](https://emojipedia.org/emoji-14.0) |
 | **exceptEmojis** | `[]` | | List of emoji IDs that will be excluded from the picker |
 | **icons** | `auto` | `auto`, `outline`, `solid` | The type of icons to use for the picker. `outline` with light theme and `solid` with dark theme. |
 | **locale** | `en` | `en`, `ar`, `be`, `cs`, `de`, `es`, `fa`, `fi`, `fr`, `hi`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `ru`, `sa`, `tr`, `uk`, `vi`, `zh` | The locale to use for the picker |
@@ -122,8 +122,8 @@ function App() {
 You can use custom emojis by providing an array of categories and their emojis. Emojis also support multiple skin tones and can be GIFs or SVGs.
 
 ```js
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
+import data from '@quotidianlabs/emojis-data'
+import Picker from '@quotidianlabs/emojis-react'
 
 const custom = [
   {
@@ -190,8 +190,8 @@ The emoji web component usage is the same no matter what library you use.
 First, you need to make sure data has been initialized. You need to call this only once per page load. Note that if you call `init` like this, you don’t necessarily need to include data in your Picker props. It doesn’t hurt either, it will noop.
 
 ```js
-import data from '@emoji-mart/data'
-import { init } from 'emoji-mart'
+import data from '@quotidianlabs/emojis-data'
+import { init } from '@quotidianlabs/emojis'
 
 init({ data })
 ```
@@ -220,8 +220,8 @@ Then you can use the emoji component in your HTML / JSX.
 You can search without the Picker. Just like the emoji component, `data` needs to be initialized first in order to use the search index.
 
 ```js
-import data from '@emoji-mart/data'
-import { init, SearchIndex } from 'emoji-mart'
+import data from '@quotidianlabs/emojis-data'
+import { init, SearchIndex } from '@quotidianlabs/emojis'
 
 init({ data })
 
@@ -241,8 +241,8 @@ search('christmas') // => ['🎄', '🇨🇽', '🧑‍🎄', '🔔', '🤶', '�
 You can get emoji data from a native emoji. This is useful if you want to get the emoji ID from a native emoji. Just like the emoji component, `data` needs to be initialized first in order to retrieve the emoji data.
 
 ```js
-import data from '@emoji-mart/data'
-import { init, getEmojiDataFromNative } from 'emoji-mart'
+import data from '@quotidianlabs/emojis-data'
+import { init, getEmojiDataFromNative } from '@quotidianlabs/emojis'
 
 init({ data })
 
@@ -263,7 +263,7 @@ getEmojiDataFromNative('🤞🏿').then(console.log)
 EmojiMart UI supports [multiple languages](https://github.com/missive/emoji-mart/tree/main/packages/emoji-mart-data/i18n), feel free to open a PR if yours is missing.
 
 ```js
-import i18n from '@emoji-mart/data/i18n/fr.json'
+import i18n from '@quotidianlabs/emojis-data/i18n/fr.json'
 i18n.search_no_results_1 = 'Aucun emoji'
 
 new Picker({ i18n })

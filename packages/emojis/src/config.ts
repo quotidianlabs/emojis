@@ -1,5 +1,5 @@
 // @ts-nocheck
-import i18n_en from '@emoji-mart/data/i18n/en.json'
+import i18n_en from '@quotidianlabs/emojis-data/i18n/en.json'
 import PickerProps from './components/Picker/PickerProps'
 import {
   FrequentlyUsed,

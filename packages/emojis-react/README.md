@@ -1,15 +1,15 @@
-# `@emoji-mart/react`
+# `@quotidianlabs/emojis-react`
 
 A React wrapper for [EmojiMart](https://missiveapp.com/open/emoji-mart).
 
 ## 🧑‍💻 Usage
 ```sh
-npm install --save emoji-mart @emoji-mart/data @emoji-mart/react
+npm install --save @quotidianlabs/emojis @quotidianlabs/emojis-data @quotidianlabs/emojis-react
 ```
 
 ```js
-import data from '@emoji-mart/data'
-import Picker from '@emoji-mart/react'
+import data from '@quotidianlabs/emojis-data'
+import Picker from '@quotidianlabs/emojis-react'
 
 function App() {
   return (
