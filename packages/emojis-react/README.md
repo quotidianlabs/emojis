@@ -1,6 +1,6 @@
 # `@quotidianlabs/emojis-react`
 
-A React wrapper for [EmojiMart](https://missiveapp.com/open/emoji-mart).
+A React wrapper for [@quotidianlabs/emojis](https://github.com/quotidianlabs/emojis).
 
 ## 🧑‍💻 Usage
 ```sh
@@ -19,4 +19,4 @@ function App() {
 ```
 
 ## 📚 Documentation
-See https://github.com/missive/emoji-mart#react
+See https://github.com/quotidianlabs/emojis#react

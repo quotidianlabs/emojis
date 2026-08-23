@@ -6,10 +6,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://missiveapp.com/open/emoji-mart",
+  "homepage": "https://github.com/quotidianlabs/emojis",
   "repository": {
     "type": "git",
-    "url": "https://github.com/missive/emoji-mart",
+    "url": "https://github.com/quotidianlabs/emojis",
     "directory": "packages/emojis"
   },
   "source": "src/index.ts",
