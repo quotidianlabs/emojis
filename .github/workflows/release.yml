@@ -1,30 +1,15 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      package:
-        description: 'Package to publish. Data first, then core, then the wrapper.'
-        required: true
-        type: choice
-        options:
-          - emojis-data
-          - emojis
-          - emojis-react
-      dist-tag:
-        description: 'Dist-tag the version lands on when you approve it.'
-        required: true
-        default: latest
-        type: choice
-        options:
-          - latest
-          - next
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
 
     permissions:
@@ -33,59 +18,80 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      # Data first, then core, then the wrapper: core is bounded to a Data minor
+      # and the wrapper resolves against core.
+      - name: Find the packages this merge bumped
+        id: bumped
+        run: |
+          bumped=
+          for package in emojis-data emojis emojis-react; do
+            manifest="packages/$package/package.json"
+            was=$(git show "HEAD^:$manifest" 2>/dev/null | node -p "JSON.parse(require('fs').readFileSync(0)).version" 2>/dev/null || echo none)
+            now=$(node -p "require('./$manifest').version")
+            if [ "$was" != "$now" ]; then
+              echo "$package $was -> $now"
+              bumped="$bumped $package"
+            fi
+          done
+          echo "packages=${bumped# }" >>"$GITHUB_OUTPUT"
+          if [ -z "$bumped" ]; then echo 'No version changed. Nothing to release.'; fi
 
       - uses: nodenv/actions/node-version@v2.0.10
+        if: steps.bumped.outputs.packages != ''
         id: nodenv
 
       - uses: actions/setup-node@v4
+        if: steps.bumped.outputs.packages != ''
         with:
           node-version: '${{ steps.nodenv.outputs.node-version }}'
           cache: 'yarn'
 
       # Trusted publishing needs npm >= 11.5.1; Node 22.23.2 bundles 10.9.8.
-      - run: npm install --global npm@11.19.0
+      - if: steps.bumped.outputs.packages != ''
+        run: npm install --global npm@11.19.0
 
-      - run: yarn install --frozen-lockfile
-      - run: yarn prettier
-      - run: yarn check:types
-      - run: yarn release:gate
+      - if: steps.bumped.outputs.packages != ''
+        run: yarn install --frozen-lockfile
+      - if: steps.bumped.outputs.packages != ''
+        run: yarn prettier
+      - if: steps.bumped.outputs.packages != ''
+        run: yarn check:types
+      - if: steps.bumped.outputs.packages != ''
+        run: yarn release:gate
 
       # Staged, not published: this authenticates over OIDC, but the version
       # only reaches the registry when a maintainer approves it with 2FA.
       - name: Stage the publish
-        working-directory: packages/${{ inputs.package }}
+        if: steps.bumped.outputs.packages != ''
         env:
-          DIST_TAG: ${{ inputs.dist-tag }}
-        run: npm stage publish --tag "$DIST_TAG"
-
-      - name: Tag the staged commit
-        env:
-          PACKAGE: ${{ inputs.package }}
+          PACKAGES: ${{ steps.bumped.outputs.packages }}
         run: |
-          version=$(node -p "require('./packages/$PACKAGE/package.json').version")
-          tag="$PACKAGE-v$version"
-          git tag "$tag"
-          git push origin "$tag"
+          for package in $PACKAGES; do
+            ( cd "packages/$package" && npm stage publish --tag latest )
+            version=$(node -p "require('./packages/$package/package.json').version")
+            tag="$package-v$version"
+            git tag "$tag"
+            git push origin "$tag"
+          done
 
       - name: How to approve
+        if: steps.bumped.outputs.packages != ''
         env:
-          PACKAGE: ${{ inputs.package }}
+          PACKAGES: ${{ steps.bumped.outputs.packages }}
         run: |
-          version=$(node -p "require('./packages/$PACKAGE/package.json').version")
           cat <<MESSAGE
-          Staged. Nothing is on the registry until you approve it:
+          Staged on the latest dist-tag. Nothing is on the registry until you
+          approve it:
 
-            npm stage list @quotidianlabs/$PACKAGE
+            npm stage list @quotidianlabs/<package>
             npm stage approve <stage-id>
 
           Inspect the exact tarball first if you want:
 
             npm stage download <stage-id>
 
-          After approving a Data release, confirm jsDelivr serves it through the
-          pin baked into every published core:
-
-            curl -sI "https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.1/sets/15/native.json" | grep x-jsd-version
-
-          It should report $version.
+          Staged:$PACKAGES
           MESSAGE
