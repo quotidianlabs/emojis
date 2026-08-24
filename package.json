@@ -15,6 +15,7 @@
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "release:gate": "node scripts/release-gate.mjs",
+    "verify:release": "node scripts/verify-release.mjs",
     "test": "jest"
   },
   "devDependencies": {

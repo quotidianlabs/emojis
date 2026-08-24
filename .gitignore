@@ -4,3 +4,4 @@ node_modules
 dist
 .idea
 .release-gate
+.verify-release

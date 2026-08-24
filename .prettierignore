@@ -5,3 +5,4 @@
 **/sets
 coverage
 .release-gate
+.verify-release

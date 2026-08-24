@@ -1,0 +1,45 @@
+name: Verify release
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Published package to verify.'
+        required: true
+        type: choice
+        options:
+          - emojis-data
+          - emojis
+          - emojis-react
+      version:
+        description: 'Version to verify, e.g. 0.1.1.'
+        required: true
+        type: string
+
+# Read-only. Verifying a release needs no write credential of any kind: it reads
+# the public registry and jsDelivr, and promotion stays a deliberate human act.
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: nodenv/actions/node-version@v2.0.10
+        id: nodenv
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '${{ steps.nodenv.outputs.node-version }}'
+          cache: 'yarn'
+
+      - run: yarn install --frozen-lockfile
+
+      - name: Verify
+        env:
+          PACKAGE: ${{ inputs.package }}
+          VERSION: ${{ inputs.version }}
+        run: yarn verify:release --package "$PACKAGE" --version "$VERSION"
