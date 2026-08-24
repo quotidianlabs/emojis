@@ -11,7 +11,7 @@
     "build:data": "yarn workspace @quotidianlabs/emojis-data build",
     "build:react": "yarn workspace @quotidianlabs/emojis-react build",
     "build:website": "yarn workspace @quotidianlabs/emojis-website build",
-    "check:types": "tsc",
+    "check:types": "tsc --project tsconfig.check.json",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "release:gate": "node scripts/release-gate.mjs",

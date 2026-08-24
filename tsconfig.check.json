@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@quotidianlabs/emojis": ["packages/emojis/src/index.ts"]
+    }
+  }
+}

@@ -20,6 +20,10 @@
     "build": "parcel build --no-autoinstall",
     "prepublishOnly": "yarn build"
   },
+  "devDependencies": {
+    "@quotidianlabs/emojis-data": ">=0.1.0 <1.0.0",
+    "@types/react": "19.2.18"
+  },
   "peerDependencies": {
     "@quotidianlabs/emojis": ">=0.1.0 <1.0.0",
     "react": "^16.8 || ^17 || ^18 || ^19"
