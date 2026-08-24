@@ -22,11 +22,11 @@ const DATA_CDN = 'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.1'
 const PUBLISHED = process.argv.includes('--published')
 
 const SCRATCH_VERSIONS = {
-  '@types/react': '18.3.31',
+  '@types/react': '19.2.18',
   esbuild: '0.28.2',
   playwright: '1.62.1',
-  react: '18.3.1',
-  'react-dom': '18.3.1',
+  react: '19.2.8',
+  'react-dom': '19.2.8',
   typescript: '5.9.3',
 }
 

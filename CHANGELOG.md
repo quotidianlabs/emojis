@@ -32,6 +32,33 @@ named `EmojiMartData`.
 
 Migrating: replace `@emoji-mart/data` with `@quotidianlabs/emojis-data`.
 
+## `@quotidianlabs/emojis-react` 0.1.2
+
+React 19 support. The change is metadata.
+
+- **Changed:** the `react` peer range widens from `^16.8 || ^17 || ^18` to
+  `^16.8 || ^17 || ^18 || ^19`. Installing the wrapper alongside React 19 no
+  longer produces a peer dependency conflict, so it needs neither an `overrides`
+  block nor `--legacy-peer-deps`. This answers
+  [Upstream issue #967](https://github.com/missive/emoji-mart/issues/967).
+- No code changed. From React the wrapper takes only `React`, `useEffect` and
+  `useRef`, and calls `createElement`; React 19 removed none of them. Core
+  renders through Preact and does not import React at all.
+- It is a patch rather than a minor so that it reaches the people it is for.
+  Caret ranges collapse below 1.0, so a consumer on `^0.1.1` resolves 0.1.2 and
+  would never have resolved 0.2.0. Anyone who installed the wrapper behind an
+  `overrides` block or `--legacy-peer-deps` gets this without editing a range,
+  and can then drop the workaround. See
+  [ADR-0002](docs/adr/0002-publish-on-a-0x-version-line.md).
+- `repository.url` is normalised to the `git+https://….git` form npm rewrites
+  it to on publish, so the manifest in the tree stops differing cosmetically
+  from the registry metadata. Folded in here as
+  [ADR-0003](docs/adr/0003-release-via-trusted-publishing.md) anticipated.
+- The release gate's scratch application moves from React 18 to React 19, so the
+  picker is proven to mount and record a selection under 19. The gate installs
+  one React version at a time, so 16.8, 17 and 18 are now declared without being
+  exercised.
+
 ## `@quotidianlabs/emojis-react` 0.1.1
 
 No code changes. This version exists to prove the trusted publishing workflow end
