@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # Release via npm trusted publishing, staged through the `next` dist-tag
@@ -12,10 +12,12 @@ smoke test passes against the real registry. We are asking people to swap out a
 package they already trust, so provenance attestation and an unpublishable-mistake
 buffer are both worth more here than release convenience.
 
-This ADR stays `proposed` until a release actually runs through it. The 0.1.0
-release did not: it was published by hand against a token, because a trusted
-publisher cannot be configured on a package that does not exist yet. What that
-release taught is recorded under "What 0.1.0 actually did" below.
+The 0.1.0 releases did not run through this: they were published by hand against
+a token, because a trusted publisher cannot be configured on a package that does
+not exist yet. What they taught is recorded under "What 0.1.0 actually did"
+below. `@quotidianlabs/emojis-react@0.1.1` was then released through the workflow
+to prove it before a release that mattered depended on it, which is what moved
+this ADR to accepted.
 
 ## Consequences
 
@@ -41,6 +43,27 @@ release taught is recorded under "What 0.1.0 actually did" below.
 - npm matches a trusted publisher against a specific workflow **filename**, so
   `.github/workflows/release.yml` cannot be renamed without reconfiguring all three
   packages on npm.
+- The trusted publisher configuration is not readable from outside: it appears
+  nowhere in the registry metadata, and npm validates nothing when it is saved. A
+  misconfiguration is indistinguishable from a correct one until a release fails
+  to authenticate. That is the argument for spending a version number on a proving
+  release rather than discovering it during one that matters.
+
+## What emojis-react 0.1.1 proved
+
+The first release through the workflow, deliberately a version that changed no
+code, on the one package where a throwaway version is inert: nothing resolves the
+wrapper automatically, whereas a Data patch is picked up immediately by the `@0.1`
+CDN pin baked into every published core.
+
+- It published over OIDC with no npm token in the workflow at all.
+- It carries a provenance attestation (`https://slsa.dev/provenance/v1`). Compare
+  `0.1.0`, published by hand, which has `signatures` but no `attestations`.
+- **`next` staging worked, on a release that was not a package's first.** Tags
+  went to `{"next":"0.1.1","latest":"0.1.0"}`, exactly as this ADR asks and
+  exactly as a first publish cannot manage.
+- The full CI suite and the release gate ran before the publish step, so a release
+  cannot skip its own gate.
 
 ## What 0.1.0 actually did
 
