@@ -213,7 +213,8 @@ createRoot(document.getElementById('root')).render(
 
   await writeFile(
     join(APP, 'types.ts'),
-    `import {
+    `import { createElement } from 'react'
+import {
   Emoji,
   Picker,
   SearchIndex,
@@ -221,7 +222,10 @@ createRoot(document.getElementById('root')).render(
   init,
 } from '${CORE}'
 import type { EmojiMartData } from '${DATA}'
-import EmojiPicker from '${REACT}'
+import EmojiPicker, {
+  EmojiPickerProps,
+  SelectedEmoji,
+} from '${REACT}'
 
 export type Data = EmojiMartData
 export const used = {
@@ -232,6 +236,16 @@ export const used = {
   getEmojiDataFromNative,
   init,
 }
+
+export const pickerProps: EmojiPickerProps = {
+  previewPosition: 'none',
+  searchPosition: 'static',
+  set: 'twitter',
+  theme: 'dark',
+  onEmojiSelect: (emoji: SelectedEmoji) => emoji.native,
+}
+
+export const rendered = createElement(EmojiPicker, pickerProps)
 `,
   )
 

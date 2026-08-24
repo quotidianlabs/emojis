@@ -32,6 +32,45 @@ named `EmojiMartData`.
 
 Migrating: replace `@emoji-mart/data` with `@quotidianlabs/emojis-data`.
 
+## `@quotidianlabs/emojis-react` 0.2.0
+
+The wrapper publishes real types. It shipped
+`export default function EmojiPicker(props: any): any`, so a consumer got no
+checking and no completion for picker configuration or for callback payloads.
+
+- **Added:** a public `EmojiPickerProps` covering every prop core accepts, with
+  the `choices` arrays of `PickerProps.ts` as unions, so `theme`, `set`,
+  `searchPosition`, `previewPosition`, `locale`, `emojiVersion`, `icons`,
+  `navPosition`, `skin` and `skinTonePosition` reject values the picker would
+  ignore at runtime.
+- **Added:** `SelectedEmoji`, the payload `onEmojiSelect` receives, alongside
+  `PickerData`, `PickerI18n`, `CustomCategory`, `CategoryIcon` and the
+  individual prop unions. Upstream's `@emoji-mart/react` exported no type names,
+  so none of this collides with the Compatibility Surface.
+- **Changed:** `// @ts-nocheck` is gone from the wrapper, and the generated
+  `dist/index.d.ts` carries no `any`.
+- No runtime change. `dist/main.js` and `dist/module.js` are byte-identical to
+  the 0.1.3 build.
+
+`SelectedEmoji` marks `native`, `unified` and `keywords` optional. The payload is
+built by reading them off the selected Skin, and a Custom Emoji's Skin carries
+only `src`, so under `strict` a consumer reaching for `emoji.native` has to
+account for that. `shortcodes` stays required: `init` assigns it to every Skin it
+walks, Custom Emoji included.
+
+`data` and `i18n` take structural types rather than importing `EmojiMartData`,
+which would turn `@quotidianlabs/emojis-data` into a dependency of the wrapper
+for the sake of a type. A type test pins that `EmojiMartData` still satisfies
+`PickerData`.
+
+This is a minor rather than a patch, which is the reverse of the call made for
+0.1.3. Types that did not exist cannot break a running application, but they can
+break a build: a consumer passing a prop this interface does not model, or
+reading `emoji.native` under `strict`, now fails to compile. Caret ranges
+collapse below 1.0, so `^0.1.3` will not resolve 0.2.0 and nobody is upgraded
+into a red build without asking for it. See
+[ADR-0002](docs/adr/0002-publish-on-a-0x-version-line.md).
+
 ## `@quotidianlabs/emojis-react` 0.1.3
 
 React 19 support. The change is metadata.
