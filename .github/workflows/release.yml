@@ -12,13 +12,13 @@ on:
           - emojis
           - emojis-react
       dist-tag:
-        description: 'Dist-tag to publish under. Stage on next, promote later.'
+        description: 'Dist-tag the version lands on when you approve it.'
         required: true
-        default: next
+        default: latest
         type: choice
         options:
-          - next
           - latest
+          - next
 
 permissions:
   contents: read
@@ -50,13 +50,15 @@ jobs:
       - run: yarn check:types
       - run: yarn release:gate
 
-      - name: Publish
+      # Staged, not published: this authenticates over OIDC, but the version
+      # only reaches the registry when a maintainer approves it with 2FA.
+      - name: Stage the publish
         working-directory: packages/${{ inputs.package }}
         env:
           DIST_TAG: ${{ inputs.dist-tag }}
-        run: npm publish --tag "$DIST_TAG"
+        run: npm stage publish --tag "$DIST_TAG"
 
-      - name: Tag the release
+      - name: Tag the staged commit
         env:
           PACKAGE: ${{ inputs.package }}
         run: |
@@ -64,3 +66,26 @@ jobs:
           tag="$PACKAGE-v$version"
           git tag "$tag"
           git push origin "$tag"
+
+      - name: How to approve
+        env:
+          PACKAGE: ${{ inputs.package }}
+        run: |
+          version=$(node -p "require('./packages/$PACKAGE/package.json').version")
+          cat <<MESSAGE
+          Staged. Nothing is on the registry until you approve it:
+
+            npm stage list @quotidianlabs/$PACKAGE
+            npm stage approve <stage-id>
+
+          Inspect the exact tarball first if you want:
+
+            npm stage download <stage-id>
+
+          After approving a Data release, confirm jsDelivr serves it through the
+          pin baked into every published core:
+
+            curl -sI "https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.1/sets/15/native.json" | grep x-jsd-version
+
+          It should report $version.
+          MESSAGE
