@@ -1,19 +1,20 @@
 {
-  "name": "@emoji-mart/monorepo",
+  "name": "@quotidianlabs/emojis-monorepo",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "dev": "yarn workspace @emoji-mart/website dev",
-    "build": "yarn workspace emoji-mart build",
-    "build:data": "yarn workspace @emoji-mart/data build",
-    "build:react": "yarn workspace @emoji-mart/react build",
-    "build:website": "yarn workspace @emoji-mart/website build",
+    "dev": "yarn workspace @quotidianlabs/emojis-website dev",
+    "build": "yarn workspace @quotidianlabs/emojis build",
+    "build:data": "yarn workspace @quotidianlabs/emojis-data build",
+    "build:react": "yarn workspace @quotidianlabs/emojis-react build",
+    "build:website": "yarn workspace @quotidianlabs/emojis-website build",
     "check:types": "tsc",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
+    "release:gate": "node scripts/release-gate.mjs",
     "test": "jest"
   },
   "devDependencies": {

@@ -1,0 +1,31 @@
+{
+  "name": "@quotidianlabs/emojis-react",
+  "version": "0.1.0",
+  "description": "React wrapper for @quotidianlabs/emojis; the emoji picker for the web.",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/quotidianlabs/emojis",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/quotidianlabs/emojis",
+    "directory": "packages/emojis-react"
+  },
+  "source": "react.tsx",
+  "types": "dist/index.d.ts",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "scripts": {
+    "build": "parcel build --no-autoinstall",
+    "prepublishOnly": "yarn build"
+  },
+  "peerDependencies": {
+    "@quotidianlabs/emojis": ">=0.1.0 <1.0.0",
+    "react": "^16.8 || ^17 || ^18"
+  },
+  "files": [
+    "/dist",
+    "LICENSE"
+  ]
+}

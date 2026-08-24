@@ -1,13 +1,16 @@
 {
-  "name": "emoji-mart",
-  "version": "5.6.0",
+  "name": "@quotidianlabs/emojis",
+  "version": "0.1.0",
   "description": "Emoji picker for the web",
   "license": "MIT",
-  "homepage": "https://missiveapp.com/open/emoji-mart",
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/quotidianlabs/emojis",
   "repository": {
     "type": "git",
-    "url": "https://github.com/missive/emoji-mart",
-    "directory": "packages/emoji-mart"
+    "url": "https://github.com/quotidianlabs/emojis",
+    "directory": "packages/emojis"
   },
   "source": "src/index.ts",
   "types": "dist/index.d.ts",
@@ -39,6 +42,7 @@
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
+    "@quotidianlabs/emojis-data": ">=0.1.0",
     "preact": "10.6.4"
   },
   "alias": {

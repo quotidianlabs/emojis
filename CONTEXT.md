@@ -59,7 +59,8 @@ _Avoid_: original, parent, the old package
 **Compatibility Surface**:
 The identifiers this fork holds byte-identical to Upstream so that consumers can
 swap packages and change nothing else: the custom element tag names, the browser
-storage key prefix, the CSS custom properties, and the CSS class names.
+storage key prefix, the CSS custom properties, the CSS class names, the browser
+global the bundle assigns, and the exported type names.
 _Avoid_: public API (that is broader), drop-in surface
 
 **Drop-in Replacement**:
