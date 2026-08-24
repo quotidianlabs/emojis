@@ -19,6 +19,11 @@ below. `@quotidianlabs/emojis-react@0.1.1` was then released through the workflo
 to prove it before a release that mattered depended on it, which is what moved
 this ADR to accepted.
 
+The `next` dist-tag half of this decision is superseded by
+[ADR-0005](0005-approve-releases-by-hand-with-staged-publishing.md): releases are
+staged and approved with 2FA rather than published to `next` and promoted. The
+trusted publishing half recorded here stands.
+
 ## Consequences
 
 - **The inherited Jest suite does not gate releases, because it cannot.** Five of
