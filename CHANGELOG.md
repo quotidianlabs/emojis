@@ -32,6 +32,16 @@ named `EmojiMartData`.
 
 Migrating: replace `@emoji-mart/data` with `@quotidianlabs/emojis-data`.
 
+## `@quotidianlabs/emojis-react` 0.1.1
+
+No code changes. This version exists to prove the trusted publishing workflow end
+to end, on the one package where a throwaway version is inert: nothing resolves
+the wrapper automatically, whereas a Data patch is picked up immediately by the
+`@0.1` CDN pin baked into every published core.
+
+It is the first release published over OIDC rather than with a token, and the
+first carrying a provenance attestation.
+
 ## `@quotidianlabs/emojis-react` 0.1.0
 
 First release. It is `@emoji-mart/react@1.1.1` renamed.
