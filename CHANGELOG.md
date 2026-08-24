@@ -32,7 +32,7 @@ named `EmojiMartData`.
 
 Migrating: replace `@emoji-mart/data` with `@quotidianlabs/emojis-data`.
 
-## `@quotidianlabs/emojis-react` 0.1.2
+## `@quotidianlabs/emojis-react` 0.1.3
 
 React 19 support. The change is metadata.
 
@@ -45,7 +45,7 @@ React 19 support. The change is metadata.
   `useRef`, and calls `createElement`; React 19 removed none of them. Core
   renders through Preact and does not import React at all.
 - It is a patch rather than a minor so that it reaches the people it is for.
-  Caret ranges collapse below 1.0, so a consumer on `^0.1.1` resolves 0.1.2 and
+  Caret ranges collapse below 1.0, so a consumer on `^0.1.1` resolves 0.1.3 and
   would never have resolved 0.2.0. Anyone who installed the wrapper behind an
   `overrides` block or `--legacy-peer-deps` gets this without editing a range,
   and can then drop the workaround. See
@@ -58,6 +58,10 @@ React 19 support. The change is metadata.
   picker is proven to mount and record a selection under 19. The gate installs
   one React version at a time, so 16.8, 17 and 18 are now declared without being
   exercised.
+- 0.1.2 carried this same change and never reached the registry. It sat on
+  `main` while the release trigger moved from a manual dispatch to a merge, and
+  the dispatch route went with it. Nothing was ever published under that number,
+  so there is nothing a consumer could have installed.
 
 ## `@quotidianlabs/emojis-react` 0.1.1
 
