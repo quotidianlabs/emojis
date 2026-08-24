@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to publish. Data first, then core, then the wrapper.'
+        required: true
+        type: choice
+        options:
+          - emojis-data
+          - emojis
+          - emojis-react
+      dist-tag:
+        description: 'Dist-tag to publish under. Stage on next, promote later.'
+        required: true
+        default: next
+        type: choice
+        options:
+          - next
+          - latest
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: nodenv/actions/node-version@v2.0.10
+        id: nodenv
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '${{ steps.nodenv.outputs.node-version }}'
+          cache: 'yarn'
+
+      # Trusted publishing needs npm >= 11.5.1; Node 22.23.2 bundles 10.9.8.
+      - run: npm install --global npm@11.19.0
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn prettier
+      - run: yarn check:types
+      - run: yarn release:gate
+
+      - name: Publish
+        working-directory: packages/${{ inputs.package }}
+        env:
+          DIST_TAG: ${{ inputs.dist-tag }}
+        run: npm publish --tag "$DIST_TAG"
+
+      - name: Tag the release
+        env:
+          PACKAGE: ${{ inputs.package }}
+        run: |
+          version=$(node -p "require('./packages/$PACKAGE/package.json').version")
+          tag="$PACKAGE-v$version"
+          git tag "$tag"
+          git push origin "$tag"
