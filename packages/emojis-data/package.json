@@ -1,6 +1,6 @@
 {
   "name": "@quotidianlabs/emojis-data",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Data for @quotidianlabs/emojis; the emoji picker for the web.",
   "license": "MIT",
   "publishConfig": {

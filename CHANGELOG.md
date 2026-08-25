@@ -24,6 +24,16 @@ behaviour change.
 - Migrating off Upstream is a find-and-replace of `emoji-mart` for
   `@quotidianlabs/emojis` in import specifiers.
 
+## `@quotidianlabs/emojis-data` 0.1.1
+
+- **Fixed:** the package declares a default export. `index.d.ts` carried only
+  interfaces, so the documented `import data from '@quotidianlabs/emojis-data'`
+  resolved to the module namespace rather than to the Data. Nothing caught it
+  while `@quotidianlabs/emojis-react` typed its props as `any`; once 0.2.0 gave
+  `data` a real type, the usage every README shows stopped type-checking. Runtime
+  behaviour is unchanged, and `EmojiMartData` is untouched. Inherited from
+  Upstream: `@emoji-mart/data@1.2.1` declares no default export either.
+
 ## `@quotidianlabs/emojis-data` 0.1.0
 
 First release. It is `@emoji-mart/data@1.2.1` renamed. The Data ships exactly as

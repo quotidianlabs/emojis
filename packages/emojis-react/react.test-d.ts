@@ -1,4 +1,5 @@
-import { createElement } from 'react'
+import { createElement, useState } from 'react'
+import bundledData from '@quotidianlabs/emojis-data'
 import type { EmojiMartData } from '@quotidianlabs/emojis-data'
 import EmojiPicker, {
   EmojiPickerProps,
@@ -28,6 +29,8 @@ const data: PickerData = {
 export const suppliedData = (supplied: EmojiMartData): EmojiPickerProps => ({
   data: supplied,
 })
+
+export const bundledSatisfiesPickerData: PickerData = bundledData
 
 export const valid: EmojiPickerProps = {
   autoFocus: true,
@@ -151,3 +154,26 @@ export const invalidPreviewPositionOnComponent = createElement(EmojiPicker, {
   // @ts-expect-error `left` is not a PreviewPosition
   previewPosition: 'left',
 })
+
+// The typed example from README.md, kept compiling. Mirror edits both ways.
+export function EmojiField({ theme }: { theme: Theme }) {
+  const [chosen, setChosen] = useState('')
+
+  const handleSelect = (emoji: SelectedEmoji) => {
+    setChosen(emoji.native ?? emoji.shortcodes)
+  }
+
+  const options: EmojiPickerProps = {
+    data: bundledData,
+    theme,
+    previewPosition: 'none',
+    onEmojiSelect: handleSelect,
+  }
+
+  return createElement(
+    'div',
+    null,
+    createElement('output', null, chosen),
+    createElement(EmojiPicker, options),
+  )
+}
