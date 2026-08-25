@@ -221,13 +221,20 @@ import {
   getEmojiDataFromNative,
   init,
 } from '${CORE}'
+import bundledData from '${DATA}'
 import type { EmojiMartData } from '${DATA}'
 import EmojiPicker, {
   EmojiPickerProps,
+  PickerData,
   SelectedEmoji,
 } from '${REACT}'
 
 export type Data = EmojiMartData
+
+// The import every README shows. It only type-checks if the packed Data
+// declares a default export, which it did not until emojis-data 0.1.1.
+export const bundled: PickerData = bundledData
+
 export const used = {
   Emoji,
   EmojiPicker,
@@ -238,6 +245,7 @@ export const used = {
 }
 
 export const pickerProps: EmojiPickerProps = {
+  data: bundledData,
   previewPosition: 'none',
   searchPosition: 'static',
   set: 'twitter',
