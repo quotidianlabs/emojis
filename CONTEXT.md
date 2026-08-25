@@ -60,8 +60,19 @@ _Avoid_: original, parent, the old package
 The identifiers this fork holds byte-identical to Upstream so that consumers can
 swap packages and change nothing else: the custom element tag names, the browser
 storage key prefix, the CSS custom properties, the CSS class names, the browser
-global the bundle assigns, and the exported type names.
+global the bundle assigns, and the type names Upstream itself exported
+(`EmojiMartData`). Membership requires an Upstream counterpart to be identical to;
+public names this fork introduced are Fork-Owned Names instead.
 _Avoid_: public API (that is broader), drop-in surface
+
+**Fork-Owned Names**:
+The declarations this fork makes public where Upstream had none: the type names
+`@quotidianlabs/emojis-react` exports, and the default export
+`@quotidianlabs/emojis-data` declares for its Data. No migration off Upstream can
+depend on them, so they sit outside the Compatibility Surface, but they are
+published and therefore held stable against our own consumers under semver. See
+[ADR-0006](docs/adr/0006-keep-fork-owned-names-out-of-the-compatibility-surface.md).
+_Avoid_: extensions (that implies added behaviour; these are declarations)
 
 **Drop-in Replacement**:
 The contract this fork offers: changing only the import specifier is sufficient to

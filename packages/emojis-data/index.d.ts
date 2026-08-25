@@ -30,3 +30,6 @@ export interface Sheet {
   cols: number
   rows: number
 }
+
+declare const data: EmojiMartData
+export default data

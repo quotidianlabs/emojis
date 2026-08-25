@@ -24,6 +24,16 @@ behaviour change.
 - Migrating off Upstream is a find-and-replace of `emoji-mart` for
   `@quotidianlabs/emojis` in import specifiers.
 
+## `@quotidianlabs/emojis-data` 0.1.1
+
+- **Fixed:** the package declares a default export. `index.d.ts` carried only
+  interfaces, so the documented `import data from '@quotidianlabs/emojis-data'`
+  resolved to the module namespace rather than to the Data. Nothing caught it
+  while `@quotidianlabs/emojis-react` typed its props as `any`; once 0.2.0 gave
+  `data` a real type, the usage every README shows stopped type-checking. Runtime
+  behaviour is unchanged, and `EmojiMartData` is untouched. Inherited from
+  Upstream: `@emoji-mart/data@1.2.1` declares no default export either.
+
 ## `@quotidianlabs/emojis-data` 0.1.0
 
 First release. It is `@emoji-mart/data@1.2.1` renamed. The Data ships exactly as
@@ -31,6 +41,21 @@ inherited, down to the Emoji Version it covers. The exported type is still
 named `EmojiMartData`.
 
 Migrating: replace `@emoji-mart/data` with `@quotidianlabs/emojis-data`.
+
+## `@quotidianlabs/emojis-react` 0.2.1
+
+Documentation only. `react.tsx` is untouched, so the build is unchanged; the bump
+exists to carry the README to the registry.
+
+- **Added:** the README documents the type names 0.2.0 began exporting — the
+  enumerated prop unions with their props and legal values, the object types, and
+  a typed usage example. It also spells out why `SelectedEmoji.native`, `unified`
+  and `keywords` are optional, and why `PickerData` is structural rather than
+  imported from `@quotidianlabs/emojis-data`.
+- These names are Fork-Owned Names, not part of the Compatibility Surface:
+  Upstream's `@emoji-mart/react` exported none, so no migration can depend on
+  them. They are still held stable under semver. See
+  [ADR-0006](docs/adr/0006-keep-fork-owned-names-out-of-the-compatibility-surface.md).
 
 ## `@quotidianlabs/emojis-react` 0.2.0
 
