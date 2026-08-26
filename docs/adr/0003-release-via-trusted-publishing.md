@@ -41,7 +41,14 @@ trusted publishing half recorded here stands.
 - Trusted publishing requires Node >= 22.14.0. Rather than run two Node versions,
   the toolchain pin in `.node-version` moves from 16.13.0 to 22.23.2, which clears
   that floor. Build and publish therefore share one Node version and one
-  `setup-node` step, and `nodenv/actions/node-version` keeps working unchanged.
+  `setup-node` step.
+- **Node is resolved by `actions/setup-node` itself, from `.node-version` via its
+  `node-version-file` input.** This ADR previously recorded that
+  `nodenv/actions/node-version` keeps working unchanged. That was a remark about the
+  pin's value moving, not a decision to use that action, and it is retracted: no
+  released version of it declares a Node 24 runtime, so keeping it would leave a
+  deprecation with a deadline and no upstream fix. The file stays the single pin it
+  always was.
 - Trusted publishing also requires npm >= 11.5.1, and Node 22.23.2 bundles npm
   10.9.8. The release workflow therefore installs a newer npm before publishing.
   This is the one place the toolchain is not what `.node-version` implies.
