@@ -29,7 +29,7 @@
     "parcel": "2.16.4",
     "prettier": "3.9.6",
     "ts-jest": "^28.0.7",
-    "typescript": "4.6.4"
+    "typescript": "5.9.3"
   },
   "prettier": {
     "semi": false,
