@@ -4,18 +4,7 @@ import { Picker } from '@quotidianlabs/emojis'
 export type EmojiSet = 'native' | 'apple' | 'facebook' | 'google' | 'twitter'
 
 export type EmojiVersion =
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 11
-  | 12
-  | 12.1
-  | 13
-  | 13.1
-  | 14
-  | 15
+  1 | 2 | 3 | 4 | 5 | 11 | 12 | 12.1 | 13 | 13.1 | 14 | 15
 
 export type Icons = 'auto' | 'outline' | 'solid'
 
