@@ -17,7 +17,7 @@
   "main": "dist/main.js",
   "module": "dist/module.js",
   "global": "dist/browser.js",
-  "browserslist": "defaults",
+  "browserslist": "chrome >= 87, firefox >= 78, safari >= 14, ios_saf >= 14, edge >= 88",
   "targets": {
     "main": {
       "includeNodeModules": true
