@@ -77,3 +77,10 @@ _Avoid_: extensions (that implies added behaviour; these are declarations)
 **Drop-in Replacement**:
 The contract this fork offers: changing only the import specifier is sufficient to
 migrate off Upstream.
+
+**Support Matrix**:
+The set of browsers a published bundle is compiled to run on, declared as an
+explicit `browserslist` query. Distinct from Native Support, which is about
+whether a browser can draw a given Emoji, not whether it can run the code. See
+[ADR-0007](docs/adr/0007-pin-the-support-matrix.md).
+_Avoid_: browser support (that phrase belongs to Native Support), targets, defaults
