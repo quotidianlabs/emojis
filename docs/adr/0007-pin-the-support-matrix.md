@@ -1,5 +1,5 @@
 ---
-status: proposed
+status: accepted
 ---
 
 # Pin the Support Matrix instead of inheriting `browserslist` defaults
@@ -13,8 +13,6 @@ dependency bump would rewrite as a side effect. The query is now written out as
 `chrome >= 87, firefox >= 78, safari >= 14, ios_saf >= 14, edge >= 88` — the
 oldest releases that run ES2020 natively, matching the `target` this repo
 already compiles to.
-
-This ADR stays `proposed` until the toolchain change it belongs to lands.
 
 ## Consequences
 

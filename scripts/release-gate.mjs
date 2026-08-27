@@ -36,24 +36,27 @@ const SCRATCH_VERSIONS = {
 // browserslist query resolves to. Committed so that widening the matrix is an
 // edit someone has to make here and defend in review, rather than something a
 // lockfile update can do on its own. See ADR-0007.
+// What `require('@quotidianlabs/emojis')` resolves to. Held byte-for-byte
+// against the list the 2022 toolchain produced.
+const CORE_COMMONJS_EXPORTS = [
+  'Data',
+  'Emoji',
+  'FrequentlyUsed',
+  'I18n',
+  'Picker',
+  'SafeFlags',
+  'SearchIndex',
+  'Store',
+  'getEmojiDataFromNative',
+  'init',
+]
+
 const SUPPORT_MATRIX = {
-  and_chr: '106',
-  and_ff: '106',
-  and_qq: '13.1',
-  and_uc: '13.4',
-  android: '106',
-  baidu: '13.18',
-  chrome: '103',
-  edge: '104',
-  firefox: '91',
-  ie: '11',
-  ios_saf: '14.5-14.8',
-  kaios: '2.5',
-  op_mini: 'all',
-  op_mob: '64',
-  opera: '90',
-  safari: '15.6',
-  samsung: '17.0',
+  chrome: '87',
+  edge: '88',
+  firefox: '78',
+  ios_saf: '14.0-14.4',
+  safari: '14',
 }
 
 const PACKAGES = [
@@ -386,6 +389,26 @@ function installScratchApp() {
   run('npm', ['install', '--no-audit', '--no-fund'], { cwd: APP })
 }
 
+// The scratch app bundles the ESM entry, and every browser check reads it, so
+// nothing else here ever loads dist/main.js. A bundler that emits a helper
+// after its own call site breaks the CommonJS entry alone, and silently.
+function checkCommonJsEntry() {
+  step('require the core package the way a CommonJS consumer would')
+
+  const read = `console.log(Object.keys(require(${JSON.stringify(CORE)})).sort().join(' '))`
+  const expected = [...CORE_COMMONJS_EXPORTS].sort().join(' ')
+
+  try {
+    const exported = capture('node', ['-e', read], { cwd: APP }).trim()
+    check(
+      `the CommonJS entry loads and exports ${expected} (${exported})`,
+      exported === expected,
+    )
+  } catch {
+    check(`the CommonJS entry loads and exports ${expected}`, false)
+  }
+}
+
 function checkPeerDependencies() {
   step('resolve the peer dependencies of the React wrapper')
   try {
@@ -656,6 +679,7 @@ const tarballs = await pack()
 checkCoreBundle(tarballs[CORE])
 await writeScratchApp(tarballs)
 installScratchApp()
+checkCommonJsEntry()
 checkPeerDependencies()
 checkTypes()
 bundleScratchApp()
