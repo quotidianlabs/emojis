@@ -357,9 +357,12 @@ export const rendered = createElement(EmojiPicker, pickerProps)
           module: 'commonjs',
           moduleResolution: 'node',
           noEmit: true,
-          skipLibCheck: true,
+          // Deliberately off: the declarations are the artifact under test.
+          skipLibCheck: false,
           strict: true,
           target: 'es2020',
+          // Nested in the repo: without this, tsc checks the workspace @types.
+          types: [],
         },
         files: ['types.ts'],
       },
@@ -423,9 +426,9 @@ function checkTypes() {
   step('type check a consumer that imports all three packages')
   try {
     run('npx', ['tsc', '--project', 'tsconfig.json'], { cwd: APP })
-    check('types resolve from all three packages', true)
+    check('the packed declarations resolve and type check', true)
   } catch {
-    check('types resolve from all three packages', false)
+    check('the packed declarations resolve and type check', false)
   }
 }
 

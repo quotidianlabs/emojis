@@ -3,6 +3,34 @@
 Packages are versioned independently: only the package that changed gets a bump.
 See [ADR-0002](docs/adr/0002-publish-on-a-0x-version-line.md).
 
+## `@quotidianlabs/emojis` 0.1.1
+
+The published declarations type check. Nothing in `dist/index.d.ts` was ever
+checked, because `skipLibCheck: true` is the common default and the release gate
+set it too, so a declaration file that no compiler could accept shipped in 0.1.0.
+
+- **Fixed:** `dist/index.d.ts` no longer carries
+  `export { default as PickerStyles } from 'bundle-text:./PickerStyles.scss'`.
+  `bundle-text:` is a Parcel build-time scheme, so a consumer with
+  `skipLibCheck: false` got an unresolved module error on a package they had
+  only imported `Picker` from. `PickerStyles` was never a runtime export of the
+  package: `src/index.ts` does not list it, and the line reached the declarations
+  only because `@parcel/transformer-typescript-types` hoisted a re-export out of
+  an internal barrel. The barrel no longer re-exports it, and the one consumer of
+  it inside the package imports it directly.
+- **Fixed:** `init`, `SearchIndex.search` and the shadow element constructor
+  declared their options bag as `{}`, so reading `caller`, `maxResults` or
+  `styles` off it was an error under the same setting. Each now declares the
+  shape its body reads.
+- No behaviour change. In `dist/browser.js`, `dist/main.js` and
+  `dist/module.js` the compiled stylesheet is now assigned ahead of the class
+  that injects it rather than after it, under a different generated module id,
+  and the two unminified entries drop one `// @ts-nocheck` comment line. Nothing
+  else moves.
+
+The release gate now builds its scratch consumer with `skipLibCheck: false`,
+which is what would have caught this.
+
 ## `@quotidianlabs/emojis` 0.1.0
 
 First release of this fork. It is `emoji-mart@5.6.0` renamed, plus exactly one

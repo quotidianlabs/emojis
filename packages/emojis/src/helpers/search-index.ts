@@ -20,7 +20,10 @@ function reset() {
   Pool = null
 }
 
-async function search(value, { maxResults, caller } = {}) {
+async function search(
+  value,
+  { maxResults, caller }: { maxResults?: number; caller?: string } = {},
+) {
   if (!value || !value.trim().length) return null
   maxResults || (maxResults = 90)
 

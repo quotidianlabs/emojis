@@ -2,7 +2,7 @@
 import { HTMLElement } from '.'
 
 export default class ShadowElement extends HTMLElement {
-  constructor(props, { styles } = {}) {
+  constructor(props, { styles }: { styles?: string } = {}) {
     super(props)
 
     this.setShadow()
