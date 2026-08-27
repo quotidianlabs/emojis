@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process'
 import { createReadStream } from 'node:fs'
-import { mkdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+
+const requireFromRoot = createRequire(import.meta.url)
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const WORK = join(ROOT, '.release-gate')
@@ -28,6 +30,30 @@ const SCRATCH_VERSIONS = {
   react: '19.2.8',
   'react-dom': '19.2.8',
   typescript: '5.9.3',
+}
+
+// The Support Matrix: the oldest release of each engine the core package's
+// browserslist query resolves to. Committed so that widening the matrix is an
+// edit someone has to make here and defend in review, rather than something a
+// lockfile update can do on its own. See ADR-0007.
+const SUPPORT_MATRIX = {
+  and_chr: '106',
+  and_ff: '106',
+  and_qq: '13.1',
+  and_uc: '13.4',
+  android: '106',
+  baidu: '13.18',
+  chrome: '103',
+  edge: '104',
+  firefox: '91',
+  ie: '11',
+  ios_saf: '14.5-14.8',
+  kaios: '2.5',
+  op_mini: 'all',
+  op_mob: '64',
+  opera: '90',
+  safari: '15.6',
+  samsung: '17.0',
 }
 
 const PACKAGES = [
@@ -95,6 +121,66 @@ function tarEntries(tarball) {
     .split('\n')
     .filter(Boolean)
     .map((entry) => entry.replace(/^package\//, ''))
+}
+
+function rank(version) {
+  const value = Number.parseFloat(version)
+  return Number.isNaN(value) ? -Infinity : value
+}
+
+function oldestPerBrowser(targets) {
+  const oldest = {}
+
+  for (const target of targets) {
+    const [browser, version] = target.split(' ')
+    const held = oldest[browser]
+    if (held === undefined || rank(version) < rank(held)) {
+      oldest[browser] = version
+    }
+  }
+
+  return oldest
+}
+
+async function checkSupportMatrix() {
+  step('resolve the Support Matrix the core package compiles to')
+
+  let browserslist
+  try {
+    browserslist = requireFromRoot('browserslist')
+  } catch {
+    check('browserslist resolves from the workspace', false)
+    return
+  }
+
+  const manifest = JSON.parse(
+    await readFile(join(ROOT, 'packages/emojis/package.json'), 'utf8'),
+  )
+  check(
+    'the core package declares a browserslist query',
+    !!manifest.browserslist,
+  )
+  if (!manifest.browserslist) return
+
+  const resolved = oldestPerBrowser(browserslist(manifest.browserslist))
+  const expected = Object.keys(SUPPORT_MATRIX).sort()
+  const actual = Object.keys(resolved).sort()
+
+  check(
+    `the matrix covers exactly ${expected.join(', ')} (resolved ${actual.join(
+      ', ',
+    )})`,
+    actual.join(',') === expected.join(','),
+  )
+
+  for (const browser of [...new Set([...expected, ...actual])].sort()) {
+    check(
+      `${browser} floor is ${
+        SUPPORT_MATRIX[browser] ?? 'outside the matrix'
+      } (resolved ${resolved[browser] ?? 'nothing'})`,
+      resolved[browser] === SUPPORT_MATRIX[browser],
+    )
+  }
 }
 
 async function pack() {
@@ -405,6 +491,54 @@ function readEmoji(page) {
   })
 }
 
+// Properties the injected stylesheet owns outright: nothing inline sets them,
+// and each differs from what the user agent gives the same markup unstyled.
+const STYLED_BY_THE_STYLESHEET = [
+  ['emoji', 'fontFamily'],
+  ['button', 'position'],
+  ['button', 'borderTopWidth'],
+  ['button', 'backgroundColor'],
+]
+
+// The stylesheet reaches the shadow root as the text of a <style> node, so a
+// bundler change that turns it into anything but a string leaves the picker on
+// user-agent defaults rather than throwing. Measure that default from the same
+// markup in a bare shadow root rather than hard-coding it.
+function readEmojiStyle(page) {
+  return page.evaluate(() => {
+    const picker = document.querySelector('em-emoji-picker')
+    const emoji = picker.shadowRoot.querySelector('.emoji-mart-emoji')
+
+    const bare = document.createElement('div')
+    bare.attachShadow({ mode: 'open' })
+    document.body.appendChild(bare)
+    const bareButton = document.createElement('button')
+    const bareEmoji = document.createElement('span')
+    bareEmoji.className = 'emoji-mart-emoji'
+    bareButton.appendChild(bareEmoji)
+    bare.shadowRoot.appendChild(bareButton)
+
+    const read = (element) => {
+      const style = getComputedStyle(element)
+      return {
+        backgroundColor: style.backgroundColor,
+        borderTopWidth: style.borderTopWidth,
+        fontFamily: style.fontFamily,
+        position: style.position,
+      }
+    }
+
+    const measured = {
+      host: getComputedStyle(picker).display,
+      emoji: { styled: read(emoji), bare: read(bareEmoji) },
+      button: { styled: read(emoji.closest('button')), bare: read(bareButton) },
+    }
+    bare.remove()
+
+    return measured
+  })
+}
+
 async function renderWithSuppliedData(browser, origin) {
   step('render the picker from the installed Data')
   const page = await browser.newPage()
@@ -424,6 +558,20 @@ async function renderWithSuppliedData(browser, origin) {
     `emoji have native characters (${rendered.natives.join(' ')})`,
     rendered.natives.every((native) => native.length > 0),
   )
+
+  const style = await readEmojiStyle(page)
+  check(
+    `the picker host is laid out by the injected stylesheet (${style.host})`,
+    style.host === 'flex',
+  )
+  for (const [element, property] of STYLED_BY_THE_STYLESHEET) {
+    const styled = style[element].styled[property]
+    const bare = style[element].bare[property]
+    check(
+      `the rendered ${element}'s ${property} is ${styled}, not the user agent's ${bare}`,
+      styled !== bare,
+    )
+  }
 
   const readStore = () =>
     page.evaluate(() => ({
@@ -503,6 +651,7 @@ async function render() {
   }
 }
 
+await checkSupportMatrix()
 const tarballs = await pack()
 checkCoreBundle(tarballs[CORE])
 await writeScratchApp(tarballs)
