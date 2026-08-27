@@ -32,12 +32,6 @@ const SCRATCH_VERSIONS = {
   typescript: '5.9.3',
 }
 
-// The Support Matrix: the oldest release of each engine the core package's
-// browserslist query resolves to. Committed so that widening the matrix is an
-// edit someone has to make here and defend in review, rather than something a
-// lockfile update can do on its own. See ADR-0007.
-// What `require('@quotidianlabs/emojis')` resolves to. Held byte-for-byte
-// against the list the 2022 toolchain produced.
 const CORE_COMMONJS_EXPORTS = [
   'Data',
   'Emoji',
@@ -51,11 +45,13 @@ const CORE_COMMONJS_EXPORTS = [
   'init',
 ]
 
+// The oldest release of each engine, not the resolved list: floors hold still
+// across caniuse-lite updates. Mirrors the core package's query. See ADR-0007.
 const SUPPORT_MATRIX = {
   chrome: '87',
   edge: '88',
   firefox: '78',
-  ios_saf: '14.0-14.4',
+  ios_saf: '14',
   safari: '14',
 }
 
@@ -126,18 +122,21 @@ function tarEntries(tarball) {
     .map((entry) => entry.replace(/^package\//, ''))
 }
 
-function rank(version) {
+function comparableVersion(version) {
   const value = Number.parseFloat(version)
   return Number.isNaN(value) ? -Infinity : value
 }
 
-function oldestPerBrowser(targets) {
+function oldestPerBrowser(resolved) {
   const oldest = {}
 
-  for (const target of targets) {
-    const [browser, version] = target.split(' ')
+  for (const entry of resolved) {
+    const [browser, version] = entry.split(' ')
     const held = oldest[browser]
-    if (held === undefined || rank(version) < rank(held)) {
+    if (
+      held === undefined ||
+      comparableVersion(version) < comparableVersion(held)
+    ) {
       oldest[browser] = version
     }
   }
@@ -177,11 +176,13 @@ async function checkSupportMatrix() {
   )
 
   for (const browser of [...new Set([...expected, ...actual])].sort()) {
+    const floor = SUPPORT_MATRIX[browser]
+    const found = resolved[browser]
     check(
-      `${browser} floor is ${
-        SUPPORT_MATRIX[browser] ?? 'outside the matrix'
-      } (resolved ${resolved[browser] ?? 'nothing'})`,
-      resolved[browser] === SUPPORT_MATRIX[browser],
+      `${browser} floor is ${floor ?? 'outside the matrix'} (resolved ${found ?? 'nothing'})`,
+      floor !== undefined &&
+        found !== undefined &&
+        comparableVersion(found) === comparableVersion(floor),
     )
   }
 }
@@ -389,9 +390,7 @@ function installScratchApp() {
   run('npm', ['install', '--no-audit', '--no-fund'], { cwd: APP })
 }
 
-// The scratch app bundles the ESM entry, and every browser check reads it, so
-// nothing else here ever loads dist/main.js. A bundler that emits a helper
-// after its own call site breaks the CommonJS entry alone, and silently.
+// Nothing else in this gate loads dist/main.js; every other check reads the ESM entry.
 function checkCommonJsEntry() {
   step('require the core package the way a CommonJS consumer would')
 
@@ -514,8 +513,7 @@ function readEmoji(page) {
   })
 }
 
-// Properties the injected stylesheet owns outright: nothing inline sets them,
-// and each differs from what the user agent gives the same markup unstyled.
+// Properties nothing inline sets, so the stylesheet is the only thing that can.
 const STYLED_BY_THE_STYLESHEET = [
   ['emoji', 'fontFamily'],
   ['button', 'position'],
@@ -524,9 +522,7 @@ const STYLED_BY_THE_STYLESHEET = [
 ]
 
 // The stylesheet reaches the shadow root as the text of a <style> node, so a
-// bundler change that turns it into anything but a string leaves the picker on
-// user-agent defaults rather than throwing. Measure that default from the same
-// markup in a bare shadow root rather than hard-coding it.
+// non-string value leaves the picker on user-agent defaults rather than throwing.
 function readEmojiStyle(page) {
   return page.evaluate(() => {
     const picker = document.querySelector('em-emoji-picker')
