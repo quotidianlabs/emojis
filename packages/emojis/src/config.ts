@@ -29,7 +29,7 @@ let initiated = false
 let initCallback = null
 let initialized = false
 
-export function init(options, { caller } = {}) {
+export function init(options, { caller }: { caller?: string } = {}) {
   promise ||
     (promise = new Promise((resolve) => {
       initCallback = resolve
