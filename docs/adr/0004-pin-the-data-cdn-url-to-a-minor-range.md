@@ -22,6 +22,7 @@ dataset change and requires a deliberate core bump to adopt.
   Data publish silently change the behaviour of every already-published core.
 - Widening the range costs a core release; the range must be revisited whenever Data
   crosses a minor.
-- This is not the only version baked into core. The spritesheet the `Emoji`
-  component reaches for is pinned exactly and has a quieter failure mode; see
-  [ADR-0008](0008-keep-the-spritesheet-version-an-exact-pin-in-core.md).
+- This is not the only version core resolves. The `emoji-datasource` release the
+  `Emoji` component draws images from is published by Data and read from there; the
+  exact literal core still carries is only a fallback. See
+  [ADR-0008](0008-derive-the-datasource-version-from-data.md).
