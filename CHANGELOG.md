@@ -18,7 +18,7 @@ minor without a bump of its own.
   so a Spritesheet left at 15.0.1 draws every non-`native` Emoji from the wrong
   cell.
   See
-  [ADR-0008](docs/adr/0008-keep-the-spritesheet-version-an-exact-pin-in-core.md).
+  [ADR-0008](docs/adr/0008-derive-the-datasource-version-from-data.md).
 - **Changed:** the default Data URL widens to
   `https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.2` on both the Set
   and i18n paths, per
@@ -47,7 +47,7 @@ Versions 15.1 and 16.
   `emoji-datasource-<set>` spritesheets at 16.0.0. A consumer who passes
   `getSpritesheetURL` must move their own Spritesheet to 16.0.0 in the same
   change, or every non-`native` Emoji will be drawn from the wrong cell. See
-  [ADR-0008](docs/adr/0008-keep-the-spritesheet-version-an-exact-pin-in-core.md).
+  [ADR-0008](docs/adr/0008-derive-the-datasource-version-from-data.md).
 - **Breaking:** the package `main` now resolves to `sets/16/native.json` rather
   than `sets/15/native.json`, so `import data from '@quotidianlabs/emojis-data'`
   returns Emoji Version 16.
