@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process'
 import { createReadStream } from 'node:fs'
-import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
@@ -20,8 +20,7 @@ const REACT = '@quotidianlabs/emojis-react'
 
 const DATA_CDN = 'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.2'
 
-// The Emoji Version the packages default to. Named, not pattern-matched: a
-// version-agnostic assertion would pass on a tarball missing the newest Set.
+// Named, not matched: a pattern would pass on a tarball missing the newest Set.
 const EMOJI_VERSION = '16'
 
 const DATA_DIR = join(ROOT, 'packages/emojis-data')
@@ -270,8 +269,7 @@ async function datasourceVersion() {
   return manifest.devDependencies['emoji-datasource']
 }
 
-// Data holds the sprite coordinates and core holds the sheet they index into,
-// in two manifests that no build step relates. See ADR-0008.
+// Two manifests that no build step relates. See ADR-0008.
 async function checkDatasourcePin() {
   step('check core and Data agree on an emoji-datasource version')
 
@@ -288,8 +286,8 @@ async function checkDatasourcePin() {
   )
 }
 
-async function fileHashes(directory) {
-  const hashes = {}
+async function fileContents(directory) {
+  const contents = {}
 
   for (const entry of await readdir(directory, {
     recursive: true,
@@ -297,29 +295,28 @@ async function fileHashes(directory) {
   })) {
     if (!entry.isFile()) continue
     const path = join(entry.parentPath, entry.name)
-    hashes[path.slice(directory.length + 1)] = await readFile(path, 'utf8')
+    contents[path.slice(directory.length + 1)] = await readFile(path, 'utf8')
   }
 
-  return hashes
+  return contents
 }
 
-// The Set files are committed so the package publishes without a build step,
-// which means nothing forces them to match the build that claims to produce them.
+// The Set files are committed, so nothing else forces them to match the build.
 async function checkDataReproducible() {
   step('regenerate the Set files and compare them to the committed ones')
 
   await mkdir(REBUILT, { recursive: true })
-  await cp(join(DATA_DIR, 'build.js'), join(REBUILT, 'build.js'))
 
+  // Run by path, not copied: require then resolves as it does for the real build.
   try {
-    run('node', ['build.js'], { cwd: REBUILT })
+    run('node', [join(DATA_DIR, 'build.js')], { cwd: REBUILT })
   } catch {
     check('the Data build runs', false)
     return
   }
 
-  const committed = await fileHashes(join(DATA_DIR, 'sets'))
-  const rebuilt = await fileHashes(join(REBUILT, 'sets'))
+  const committed = await fileContents(join(DATA_DIR, 'sets'))
+  const rebuilt = await fileContents(join(REBUILT, 'sets'))
 
   const missing = Object.keys(rebuilt).filter((file) => !(file in committed))
   const extra = Object.keys(committed).filter((file) => !(file in rebuilt))
@@ -709,8 +706,7 @@ async function renderWithSuppliedData(browser, origin) {
   await page.close()
 }
 
-// The sheet geometry Data ships is derived from the datasource, so deriving the
-// expectation the same way would agree with a wrong sheet. Read it back instead.
+// Read from the datasource, not from Data: Data's geometry is what is under test.
 function datasourceSheet() {
   const data = requireFromRoot('emoji-datasource')
   const coordinates = {}
@@ -751,13 +747,18 @@ function readSprites(page) {
     return buttons
       .map((button) => {
         const sprite = button.querySelector('.emoji-mart-emoji span')
-        if (!sprite || !sprite.style.backgroundImage) return null
+        if (!sprite) return null
+
+        const style = getComputedStyle(sprite)
+        if (!style.backgroundImage || style.backgroundImage === 'none') {
+          return null
+        }
 
         return {
           native: button.getAttribute('aria-label'),
-          position: sprite.style.backgroundPosition,
-          size: sprite.style.backgroundSize,
-          image: sprite.style.backgroundImage,
+          position: style.backgroundPosition,
+          size: style.backgroundSize,
+          image: style.backgroundImage,
         }
       })
       .filter(Boolean)

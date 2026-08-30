@@ -11,11 +11,12 @@ minor without a bump of its own.
 - **Added:** `emojiVersion` accepts `15.1` and `16`, and defaults to `16`. On a
   platform without Native Support for them the existing per-viewer version
   filter hides the newer Emoji, so nothing renders as tofu.
-- **Breaking:** the bundled spritesheet URL pins `emoji-datasource-<set>` at
+- **Breaking:** the bundled Spritesheet URL pins `emoji-datasource-<set>` at
   `16.0.0` rather than `15.0.1`, in lockstep with Data. A consumer who passes
-  `getSpritesheetURL` supplies their own sheet and must move it to 16.0.0
+  `getSpritesheetURL` supplies their own Spritesheet and must move it to 16.0.0
   themselves; sprite coordinates moved for 3291 Skins and the grid is now 62x62,
-  so a sheet left at 15.0.1 draws every non-`native` emoji from the wrong cell.
+  so a Spritesheet left at 15.0.1 draws every non-`native` Emoji from the wrong
+  cell.
   See
   [ADR-0008](docs/adr/0008-keep-the-spritesheet-version-an-exact-pin-in-core.md).
 - **Changed:** the default Data URL widens to
@@ -23,9 +24,10 @@ minor without a bump of its own.
   and i18n paths, per
   [ADR-0004](docs/adr/0004-pin-the-data-cdn-url-to-a-minor-range.md).
 - **Changed:** the Native Support probe knows about Emoji Versions 15.1 and 16,
-  so `latestVersion()` can report them. It probes `phoenix` for 15.1 — every
-  Emoji added in 15.1 is a ZWJ sequence, so a ZWJ probe is unavoidable there —
-  and `face_with_bags_under_eyes` for 16.
+  so `latestVersion()` can report them. It probes `phoenix` for 15.1 and
+  `face_with_bags_under_eyes` for 16. Every Emoji added in 15.1 is a ZWJ
+  sequence, so a ZWJ probe is unavoidable there; the table already uses one for
+  13.1 and 12.1.
 
 ## `@quotidianlabs/emojis-data` 0.2.0
 
@@ -40,11 +42,11 @@ Versions 15.1 and 16.
   (`harp`, `shovel`, `leafless_tree`, `fingerprint`, `root_vegetable`,
   `splatter`, `face_with_bags_under_eyes`, `flag-sark`).
 - **Breaking:** sprite coordinates moved. 3291 Skin coordinates changed and the
-  sheet grew from 61x61 to 62x62, so every Set file now reports
+  Spritesheet grid grew from 61x61 to 62x62, so every Set file now reports
   `sheet: { cols: 62, rows: 62 }`. Data at 0.2 is only correct against the
   `emoji-datasource-<set>` spritesheets at 16.0.0. A consumer who passes
-  `getSpritesheetURL` must move their own sheet to 16.0.0 in the same change, or
-  every non-`native` emoji will be drawn from the wrong cell. See
+  `getSpritesheetURL` must move their own Spritesheet to 16.0.0 in the same
+  change, or every non-`native` Emoji will be drawn from the wrong cell. See
   [ADR-0008](docs/adr/0008-keep-the-spritesheet-version-an-exact-pin-in-core.md).
 - **Breaking:** the package `main` now resolves to `sets/16/native.json` rather
   than `sets/15/native.json`, so `import data from '@quotidianlabs/emojis-data'`
@@ -59,7 +61,7 @@ Versions 15.1 and 16.
 - Keywords are unchanged: `emojilib` stays at 3.0.10. Bumping it rewrites 1707
   of 1870 keyword lists, which changes search results, and that reaches every
   published core as a Data patch without needing a core release.
-- The sheet geometry is now computed by the build from the datasource rather
+- The `sheet` geometry is now computed by the build from the datasource rather
   than written as a literal.
 
 ## `@quotidianlabs/emojis-react` 0.3.0

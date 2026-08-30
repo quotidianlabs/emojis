@@ -26,8 +26,7 @@ const KEYWORD_SUBSTITUTES = {
   highfive: 'highfive high-five',
 }
 
-// The sheet is one square grid shared by every Set, so its size is a property of
-// the datasource rather than of the Set or the Emoji Version being built.
+// One grid shared by every Set, so its size belongs to the datasource, not the build.
 function sheetGeometry() {
   let max = 0
 
