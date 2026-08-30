@@ -53,10 +53,12 @@ exact tarball if something needs inspecting first.
   again inside the release workflow before staging, because `main` can move
   between a green pull request and its merge and the merge commit is what gets
   staged.
-- **The inherited Jest suite does not gate releases, because it cannot.** Five of
-  its six files are empty `test.skip` stubs; only two real tests exist, covering
-  `deepEqual` and `sleep`. CI green means prettier passed, types compiled, and the
-  gate rendered. Replacing that suite is #8.
+- **The Jest suite does not gate releases.** It covers what a browser-level gate
+  cannot reach, because the gate renders the picker in its default state: the
+  storage key prefix ADR-0001 commits to, Frequently Used ordering and eviction,
+  and search resolution and ranking. It never packs or installs a tarball, so it
+  says nothing about what ships. CI green means prettier passed, types compiled,
+  the unit suite passed, and the gate rendered.
 - **The one post-publish check that survives applies only to Data.** The `@0.1`
   jsDelivr pin baked into every published core means a Data release becomes what
   every default install fetches, with no core release involved, and whether
