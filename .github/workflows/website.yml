@@ -7,18 +7,17 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
 
 jobs:
-  # The demo is built from the workspace, not from published packages, so it
-  # shows the commit it was built from rather than a version number.
   build:
     runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-build-${{ github.ref }}
+      cancel-in-progress: true
+
     steps:
       - uses: actions/checkout@v7
 
@@ -29,8 +28,6 @@ jobs:
 
       - run: yarn install
       - run: yarn build:website
-
-      - run: npx playwright install --with-deps chromium
       - run: yarn check:website
 
       # After the check, so a site whose picker does not mount is never uploaded.
@@ -42,6 +39,11 @@ jobs:
     needs: build
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
+
+    # Never cancelled: cancelling mid-deploy can strand a Pages deployment.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
 
     permissions:
       pages: write

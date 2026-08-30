@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { execFileSync } from 'node:child_process'
 import { createReadStream } from 'node:fs'
 import { readFile, readdir } from 'node:fs/promises'
 import { createServer } from 'node:http'
@@ -13,9 +14,7 @@ const DIST = join(SITE, 'dist')
 
 const REPO = 'https://github.com/quotidianlabs/emojis'
 
-// The fork banner links to `github.com/missive/emoji-mart`, which is Upstream's
-// repository and has to stay. What must not survive is the previous maintainer
-// presenting as this site's author, sponsor or host.
+// Upstream's repository link is not a match: the fork banner has to keep it.
 const PREVIOUS_MAINTAINER = [
   /missiveapp\.com/i,
   /by\s+Missive/i,
@@ -123,8 +122,7 @@ async function checkMarkup(pages) {
   }
 }
 
-// The footer is shared by every page through the layout, and its commit link is
-// filled in at runtime, so this reads the rendered DOM rather than the markup.
+// Reads the rendered DOM: the commit link is filled in at runtime.
 async function checkProvenance(page) {
   const footer = await page.evaluate(() => {
     const link = document.querySelector('#build-commit')
@@ -151,14 +149,8 @@ async function checkProvenance(page) {
   )
 }
 
-// Which pages owe a picker is read from their source, not from whether one turns
-// up in the browser: a page that silently fails to mount must fail this check
-// rather than skip it.
-async function pagesThatMountAPicker() {
-  const sources = (await readdir(SITE)).filter(
-    (file) => extname(file) === '.html' && file !== 'layout.html',
-  )
-
+// Read from source, so a page that fails to mount fails rather than skips.
+async function pagesThatMountAPicker(sources) {
   const mounting = []
   for (const name of sources) {
     const source = await readFile(join(SITE, name), 'utf8')
@@ -215,20 +207,27 @@ const pages = (await readdir(DIST))
   .filter((file) => extname(file) === '.html')
   .sort()
 
-const mounting = await pagesThatMountAPicker()
+const sources = (await readdir(SITE)).filter(
+  (file) => extname(file) === '.html' && file !== 'layout.html',
+)
+const mounting = await pagesThatMountAPicker(sources)
 
 step('check the build emitted every page')
+const examples = (names) => names.filter((name) => name.startsWith('example-'))
 check(
-  `the build emitted the seven example pages (${pages.length} pages total)`,
-  pages.filter((page) => page.startsWith('example-')).length === 7,
+  `every example page was built (${examples(pages).length} of ${examples(sources).length})`,
+  examples(pages).length === examples(sources).length,
 )
-const missing = mounting.filter((name) => !pages.includes(name))
+const missing = sources.filter((name) => !pages.includes(name))
 check(
   `every source page was built (${missing.join(' ') || 'none missing'})`,
   !missing.length,
 )
 
 await checkMarkup(pages)
+
+step('install a browser')
+execFileSync('npx', ['playwright', 'install', 'chromium'], { stdio: 'inherit' })
 
 step(`render every page in a browser (${mounting.length} owe a picker)`)
 const server = await serve()
