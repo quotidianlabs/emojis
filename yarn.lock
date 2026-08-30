@@ -2371,10 +2371,10 @@ emittery@^0.13.1:
   resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.13.1.tgz#c04b8c3457490e0847ae51fced3af52d338e3dad"
   integrity sha512-DeWwawk6r5yR9jFgnDKYt4sLS0LmHJJi3ZOnb5/JdbYwj3nW+FxQnHIjhBKz8YLC7oRNPVM9NQ47I3CVx34eqQ==
 
-emoji-datasource@15.0.1:
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/emoji-datasource/-/emoji-datasource-15.0.1.tgz#6cc7676e4d48d7559c2e068ffcacf84ec653584c"
-  integrity sha512-aF5Q6LCKXzJzpG4K0ETiItuzz0xLYxNexR9qWw45/shuuEDWZkOIbeGHA23uopOSYA/LmeZIXIFsySCx+YKg2g==
+emoji-datasource@16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/emoji-datasource/-/emoji-datasource-16.0.0.tgz#7977edaa5b0099696bc720e43dd608d91ae2f208"
+  integrity sha512-/qHKqK5Nr3+8zhgO6kHmF43Fm5C8HNn0AaFRIpgw8HF3+uF0Vfc8jgLI1ZQS5ba1vBzksS8NBCjHejwLb2D/Sg==
 
 emoji-regex@^8.0.0:
   version "8.0.0"

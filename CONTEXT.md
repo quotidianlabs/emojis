@@ -24,7 +24,7 @@ The visual style an Emoji is drawn in: `native`, `apple`, `facebook`, `google`, 
 _Avoid_: theme (that word is taken: it means light/dark), style, pack
 
 **Emoji Version**:
-The Unicode release an Emoji first appeared in. Ranges from 1 to 15.
+The Unicode release an Emoji first appeared in. Ranges from 1 to 16.
 _Avoid_: unicode version, emoji version number
 
 **Native Support**:
@@ -45,6 +45,15 @@ The emoji dataset: categories, emojis, aliases and spritesheet geometry for one
 Emoji Version and one Set. Ships as its own package and can also be supplied by
 the consumer.
 _Avoid_: dataset, emoji data, index
+
+**Spritesheet**:
+The single grid image every non-`native` Set is drawn from, published by
+`emoji-datasource-<set>`. Data holds each Skin's cell as `x`/`y` coordinates plus
+the grid's size, under the field name `sheet`; core holds the URL of the image
+those coordinates index into. The two are only correct together, so they are
+pinned to the same `emoji-datasource` version and released together. See
+[ADR-0008](docs/adr/0008-keep-the-spritesheet-version-an-exact-pin-in-core.md).
+_Avoid_: sprite map, atlas. Bare "sheet" names the geometry, not the image.
 
 **Custom Emoji**:
 An Emoji supplied by the consumer rather than drawn from Data.
