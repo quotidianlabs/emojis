@@ -99,6 +99,12 @@ header {
   text-align: center;
 }
 
+.fork-banner {
+  margin: 0.5em 0 0;
+  font-size: 13px;
+  opacity: 0.75;
+}
+
 h1 {
   font-family: 'Courier New', Courier, monospace;
   font-size: 30px;
@@ -217,84 +223,8 @@ footer {
   nav { margin: 1em 0 2em }
 }
 
-#missive {
-  position: relative;
-  text-align: left;
-  padding: 12px;
-  border-radius: 14px;
-  background-color: var(--dark-background-color);
-  box-shadow: inset 0 1px 4px -3px #000,
-                    0 1px var(--light-shadow);
+#colophon {
+  text-align: center;
 
-  img {
-    display: block;
-  }
-
-  p {
-    max-width: 10em;
-    margin-left: 12px;
-  }
-
-  &:hover #coin-box {
-    animation: shake 300ms cubic-bezier(.36,.07,.19,.97) both;
-  }
-}
-
-$coinSize: 24px;
-#coin-box {
-  cursor: grabbing;
-  position: relative;
-  user-select: none;
-
-  img {
-    z-index: 1;
-    position: relative;
-  }
-
-  .coin-wrap {
-    pointer-events: none;
-    position: absolute;
-    top: 50%; left: 50%;
-    margin-left: calc($coinSize / -2);
-    margin-top: calc($coinSize / -2);
-    animation: coin-bounce 300ms ease-out;
-  }
-
-  &:active {
-    img { animation: box-bounce 150ms var(--easing) }
-  }
-}
-
-.coin-wrap {
-  display: block;
-}
-
-.coin {
-  display: block;
-  width: $coinSize; height: $coinSize;
-  background: url("./assets/coin.png") top left no-repeat;
-  background-size: cover;
-  animation: flip 200ms steps(7) infinite;
-}
-
-@keyframes flip {
-  100% { background-position: calc($coinSize * -7); }
-}
-
-@keyframes coin-bounce {
-  50% { transform: translateY(-360%) }
-  75% { transform: translateY(-340%) }
-  100% { transform: translateY(-200%) }
-}
-
-@keyframes box-bounce {
-  50% { transform: translateY(-10%) }
-}
-
-@keyframes shake {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(5deg); }
-  50% { transform: rotate(0eg); }
-  75% { transform: rotate(-5deg); }
-  100% { transform: rotate(0deg); }
+  p { margin: 0 0 0.5em }
 }

@@ -1,0 +1,58 @@
+name: Website
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-build-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.node-version'
+          cache: 'yarn'
+
+      - run: yarn install
+      - run: yarn build:website
+      - run: yarn check:website
+
+      # After the check, so a site whose picker does not mount is never uploaded.
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: packages/emojis-website/dist
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    # Never cancelled: cancelling mid-deploy can strand a Pages deployment.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

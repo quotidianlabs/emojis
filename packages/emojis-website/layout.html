@@ -5,13 +5,13 @@
     <title>Emoji Mart • One component to pick them all</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="twitter:image" content="./assets/EmojiMart-Social.png" />
-    <meta name="twitter:site_name" content="EmojiMart by Missive" />
-    <meta name="twitter:site" content="@missiveapp" />
+    <meta name="twitter:site_name" content="Emoji Mart by Quotidian Labs" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="EmojiMart by Missive" />
+    <meta name="twitter:title" content="Emoji Mart by Quotidian Labs" />
     <meta name="twitter:description" content="One component to pick them all" />
     <meta property="og:image" content="./assets/EmojiMart-Social.png" />
-    <meta property="og:site_name" content="EmojiMart by Missive" />
+    <meta property="og:site_name" content="Emoji Mart by Quotidian Labs" />
+    <meta property="og:title" content="Emoji Mart by Quotidian Labs" />
     <meta property="og:description" content="One component to pick them all" />
     <meta property="og:type" content="website" />
     <link
@@ -28,6 +28,12 @@
             <em-emoji id="convenience_store"></em-emoji>
             Emoji Mart
           </h1>
+          <p class="fork-banner">
+            A maintained fork of
+            <a href="https://github.com/missive/emoji-mart">emoji-mart</a>,
+            unmaintained since 2024. Maintained by
+            <a href="https://github.com/quotidianlabs">Quotidian Labs</a>.
+          </p>
           <if condition="exampleName">
             <a href="./examples.html">⬅️ Examples</a> → {{ exampleName }}
           </if>
@@ -90,45 +96,28 @@
           </nav>
 
           <div class="flex flex-center">
-            <div id="missive" class="flex flex-middle">
-              <div id="coin-box">
-                <img
-                  src="./assets/missive.png"
-                  width="34"
-                  height="34"
-                  draggable="false"
-                />
-              </div>
+            <div id="colophon">
               <p>
-                Brought to you by the
-                <a
-                  href="https://missiveapp.com"
-                  title="Team Email, Chat & Tasks"
-                  ><em-emoji id="mailbox_with_mail"></em-emoji> Missive</a
-                >
-                team
+                <a href="https://www.npmjs.com/package/@quotidianlabs/emojis"
+                  >@quotidianlabs/emojis</a
+                >, maintained by
+                <a href="https://github.com/quotidianlabs">Quotidian Labs</a>
               </p>
-              <audio id="coin-audio" src="./assets/coin.mp3"></audio>
+              <p>
+                Built from
+                <a
+                  id="build-commit"
+                  href="https://github.com/quotidianlabs/emojis"
+                  >an unrecorded commit</a
+                >
+              </p>
               <script type="module">
-                const coinBox = document.querySelector('#coin-box')
-                const coinAudio = document.querySelector('#coin-audio')
-
-                coinBox.addEventListener('mousedown', () => {
-                  const coin = document.createElement('span')
-                  coin.className = 'coin-wrap'
-                  coin.innerHTML = '<span class="coin"></span>'
-
-                  coinBox.appendChild(coin)
-
-                  const audio = new Audio(coinAudio.src)
-                  audio.currentTime = 0.25
-                  audio.volume = 0.33
-                  audio.play()
-
-                  coin.addEventListener('animationend', () => {
-                    coinBox.removeChild(coin)
-                  })
-                })
+                const sha = process.env.SITE_COMMIT_SHA
+                if (sha) {
+                  const link = document.querySelector('#build-commit')
+                  link.textContent = sha
+                  link.href = `https://github.com/quotidianlabs/emojis/commit/${sha}`
+                }
               </script>
             </div>
           </div>

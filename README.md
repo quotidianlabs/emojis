@@ -2,6 +2,7 @@
   <br><b>@quotidianlabs/emojis</b> is a customizable<br>emoji picker HTML component for the web
   <br><br>A maintained fork of <a href="https://github.com/missive/emoji-mart">emoji-mart</a>, which has been unmaintained since 2024.
   <br>Maintained by <a href="https://github.com/quotidianlabs">Quotidian Labs</a>.
+  <br><br><b><a href="https://quotidianlabs.github.io/emojis/">🏪 Try the live demo</a></b>
 </div>
 
 ## 📖 Table of Contents
@@ -271,12 +272,15 @@ Given the small file size, English is built-in and doesn’t need to be provided
 
 ## 📚 Examples
 
-- [Categories](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-categories.html)
-- [Custom emoji font](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-custom-font.html)
-- [Custom styles](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-custom-styles.html)
-- [Emoji component](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-emoji-component.html)
-- [Headless search](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-headless-search.html)
-- [Slack colors](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-slack-colors.html)
+Every example below runs on the [live demo](https://quotidianlabs.github.io/emojis/examples.html).
+
+- [Categories](https://quotidianlabs.github.io/emojis/example-categories.html) — [source](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-categories.html)
+- [Custom emoji font](https://quotidianlabs.github.io/emojis/example-custom-font.html) — [source](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-custom-font.html)
+- [Custom styles](https://quotidianlabs.github.io/emojis/example-custom-styles.html) — [source](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-custom-styles.html)
+- [Dynamic width](https://quotidianlabs.github.io/emojis/example-dynamic-width.html) — [source](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-dynamic-width.html)
+- [Emoji component](https://quotidianlabs.github.io/emojis/example-emoji-component.html) — [source](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-emoji-component.html)
+- [Headless search](https://quotidianlabs.github.io/emojis/example-headless-search.html) — [source](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-headless-search.html)
+- [Slack colors](https://quotidianlabs.github.io/emojis/example-slack-colors.html) — [source](https://github.com/quotidianlabs/emojis/blob/main/packages/emojis-website/example-slack-colors.html)
 
 ## 🤓 Built for modern browsers
 EmojiMart relies on these APIs, you may need to include polyfills if you need to support older browsers:

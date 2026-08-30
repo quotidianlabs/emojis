@@ -74,6 +74,16 @@ published and therefore held stable against our own consumers under semver. See
 [ADR-0006](docs/adr/0006-keep-fork-owned-names-out-of-the-compatibility-surface.md).
 _Avoid_: extensions (that implies added behaviour; these are declarations)
 
+**Emoji Mart**:
+The product name this fork continues to use in user-facing material: the demo's
+headline, the README title. Distinct from the package family
+(`@quotidianlabs/emojis`) and from Upstream (the repository and packages this fork
+was made from). Keeping it is deliberate: a consumer migrating off an abandoned
+dependency has to recognise what they are landing on, which is the reasoning
+[ADR-0001](docs/adr/0001-preserve-upstream-runtime-identifiers.md) applies to the
+runtime identifiers.
+_Avoid_: using it to mean Upstream, or as a package name.
+
 **Drop-in Replacement**:
 The contract this fork offers: changing only the import specifier is sufficient to
 migrate off Upstream.
