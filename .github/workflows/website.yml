@@ -1,0 +1,56 @@
+name: Website
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # The demo is built from the workspace, not from published packages, so it
+  # shows the commit it was built from rather than a version number.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.node-version'
+          cache: 'yarn'
+
+      - run: yarn install
+      - run: yarn build:website
+
+      - run: npx playwright install --with-deps chromium
+      - run: yarn check:website
+
+      # After the check, so a site whose picker does not mount is never uploaded.
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: packages/emojis-website/dist
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
