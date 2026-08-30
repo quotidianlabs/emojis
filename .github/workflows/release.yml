@@ -91,3 +91,19 @@ jobs:
 
           Staged:$PACKAGES
           MESSAGE
+
+          data=
+          core=
+          for package in $PACKAGES; do
+            if [ "$package" = emojis-data ]; then data=yes; fi
+            if [ "$package" = emojis ]; then core=yes; fi
+          done
+
+          if [ -n "$data" ] && [ -n "$core" ]; then
+            cat <<'ORDER'
+
+          Approve emojis-data BEFORE emojis. Core is bounded to a Data minor, so
+          a core approved first ships a default data path that 404s until Data
+          lands. Staging order does not enforce this; approval is manual.
+          ORDER
+          fi

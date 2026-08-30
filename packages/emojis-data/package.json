@@ -1,6 +1,6 @@
 {
   "name": "@quotidianlabs/emojis-data",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Data for @quotidianlabs/emojis; the emoji picker for the web.",
   "license": "MIT",
   "publishConfig": {
@@ -12,14 +12,14 @@
     "url": "https://github.com/quotidianlabs/emojis",
     "directory": "packages/emojis-data"
   },
-  "main": "sets/15/native.json",
+  "main": "sets/16/native.json",
   "types": "index.d.ts",
   "scripts": {
     "build": "node ./build.js"
   },
   "sideEffects": false,
   "devDependencies": {
-    "emoji-datasource": "15.0.1",
+    "emoji-datasource": "16.0.0",
     "emojilib": "3.0.10",
     "inflection": "2.0.1",
     "unicode-emoji-json": "0.4.0"

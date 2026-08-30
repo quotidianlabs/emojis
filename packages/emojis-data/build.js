@@ -7,7 +7,7 @@ const unicodeEmoji = require('unicode-emoji-json')
 
 const DRY_RUN = process.argv.indexOf('--dry') != -1
 
-const VERSIONS = [1, 2, 3, 4, 5, 11, 12, 12.1, 13, 13.1, 14, 15]
+const VERSIONS = [1, 2, 3, 4, 5, 11, 12, 12.1, 13, 13.1, 14, 15, 15.1, 16]
 const SKINS = ['1F3FB', '1F3FC', '1F3FD', '1F3FE', '1F3FF']
 const SETS = ['native', 'apple', 'facebook', 'google', 'twitter']
 const CATEGORIES = [
@@ -26,6 +26,25 @@ const KEYWORD_SUBSTITUTES = {
   highfive: 'highfive high-five',
 }
 
+// The sheet is one square grid shared by every Set, so its size is a property of
+// the datasource rather than of the Set or the Emoji Version being built.
+function sheetGeometry() {
+  let max = 0
+
+  for (const datum of emojiData) {
+    max = Math.max(max, datum.sheet_x, datum.sheet_y)
+
+    for (const skin in datum.skin_variations || {}) {
+      const variation = datum.skin_variations[skin]
+      max = Math.max(max, variation.sheet_x, variation.sheet_y)
+    }
+  }
+
+  return { cols: max + 1, rows: max + 1 }
+}
+
+const SHEET = sheetGeometry()
+
 function unifiedToNative(unified) {
   let unicodes = unified.split('-')
   let codePoints = unicodes.map((u) => `0x${u}`)
@@ -40,7 +59,7 @@ function buildData({ set, version } = {}) {
     categories: [],
     emojis: {},
     aliases: {},
-    sheet: { cols: 61, rows: 61 },
+    sheet: { ...SHEET },
   }
 
   CATEGORIES.forEach((category, i) => {
@@ -218,7 +237,7 @@ function buildData({ set, version } = {}) {
 }
 
 if (!DRY_RUN) {
-  rmSync('sets', { recursive: true })
+  rmSync('sets', { recursive: true, force: true })
 }
 
 for (let version of VERSIONS) {

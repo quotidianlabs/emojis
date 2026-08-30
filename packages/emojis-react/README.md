@@ -65,7 +65,7 @@ for what each prop does.
 | Type | Prop | Values |
 | ---- | ---- | ------ |
 | **EmojiSet** | `set` | `native`, `apple`, `facebook`, `google`, `twitter` |
-| **EmojiVersion** | `emojiVersion` | `1`, `2`, `3`, `4`, `5`, `11`, `12`, `12.1`, `13`, `13.1`, `14`, `15` |
+| **EmojiVersion** | `emojiVersion` | `1`, `2`, `3`, `4`, `5`, `11`, `12`, `12.1`, `13`, `13.1`, `14`, `15`, `15.1`, `16` |
 | **Icons** | `icons` | `auto`, `outline`, `solid` |
 | **Locale** | `locale` | `en`, `ar`, `be`, `cs`, `de`, `es`, `fa`, `fi`, `fr`, `hi`, `it`, `ja`, `ko`, `nl`, `pl`, `pt`, `ru`, `sa`, `tr`, `uk`, `vi`, `zh` |
 | **NavPosition** | `navPosition` | `top`, `bottom`, `none` |

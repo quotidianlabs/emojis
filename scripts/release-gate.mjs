@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from 'node:child_process'
 import { createReadStream } from 'node:fs'
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
@@ -18,7 +18,14 @@ const CORE = '@quotidianlabs/emojis'
 const DATA = '@quotidianlabs/emojis-data'
 const REACT = '@quotidianlabs/emojis-react'
 
-const DATA_CDN = 'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.1'
+const DATA_CDN = 'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.2'
+
+// The Emoji Version the packages default to. Named, not pattern-matched: a
+// version-agnostic assertion would pass on a tarball missing the newest Set.
+const EMOJI_VERSION = '16'
+
+const DATA_DIR = join(ROOT, 'packages/emojis-data')
+const REBUILT = join(WORK, 'data')
 
 // Only meaningful once Data is on the registry: jsDelivr cannot serve it before.
 const PUBLISHED = process.argv.includes('--published')
@@ -61,7 +68,7 @@ const PACKAGES = [
     dir: 'packages/emojis-data',
     build: null,
     top: ['LICENSE', 'README.md', 'index.d.ts', 'package.json', 'i18n', 'sets'],
-    required: ['i18n/en.json', 'sets/15/native.json'],
+    required: ['i18n/en.json', `sets/${EMOJI_VERSION}/native.json`],
   },
   {
     name: CORE,
@@ -256,6 +263,79 @@ function checkCoreBundle(tarball) {
   check('core still exposes the EmojiMart global', bundle.includes('EmojiMart'))
 }
 
+async function datasourceVersion() {
+  const manifest = JSON.parse(
+    await readFile(join(DATA_DIR, 'package.json'), 'utf8'),
+  )
+  return manifest.devDependencies['emoji-datasource']
+}
+
+// Data holds the sprite coordinates and core holds the sheet they index into,
+// in two manifests that no build step relates. See ADR-0008.
+async function checkDatasourcePin() {
+  step('check core and Data agree on an emoji-datasource version')
+
+  const version = await datasourceVersion()
+  const source = await readFile(
+    join(ROOT, 'packages/emojis/src/components/Emoji/Emoji.tsx'),
+    'utf8',
+  )
+  const pinned = source.match(/DATASOURCE_VERSION = '([^']+)'/)?.[1]
+
+  check(
+    `core pins emoji-datasource ${pinned} and Data builds against ${version}`,
+    !!version && pinned === version,
+  )
+}
+
+async function fileHashes(directory) {
+  const hashes = {}
+
+  for (const entry of await readdir(directory, {
+    recursive: true,
+    withFileTypes: true,
+  })) {
+    if (!entry.isFile()) continue
+    const path = join(entry.parentPath, entry.name)
+    hashes[path.slice(directory.length + 1)] = await readFile(path, 'utf8')
+  }
+
+  return hashes
+}
+
+// The Set files are committed so the package publishes without a build step,
+// which means nothing forces them to match the build that claims to produce them.
+async function checkDataReproducible() {
+  step('regenerate the Set files and compare them to the committed ones')
+
+  await mkdir(REBUILT, { recursive: true })
+  await cp(join(DATA_DIR, 'build.js'), join(REBUILT, 'build.js'))
+
+  try {
+    run('node', ['build.js'], { cwd: REBUILT })
+  } catch {
+    check('the Data build runs', false)
+    return
+  }
+
+  const committed = await fileHashes(join(DATA_DIR, 'sets'))
+  const rebuilt = await fileHashes(join(REBUILT, 'sets'))
+
+  const missing = Object.keys(rebuilt).filter((file) => !(file in committed))
+  const extra = Object.keys(committed).filter((file) => !(file in rebuilt))
+  const differing = Object.keys(rebuilt).filter(
+    (file) => file in committed && committed[file] !== rebuilt[file],
+  )
+
+  check(
+    `the build produces the committed Set files (${Object.keys(rebuilt).length})`,
+    !missing.length && !extra.length && !differing.length,
+  )
+  for (const file of [...missing, ...extra, ...differing].slice(0, 10)) {
+    console.log(`       ${file}`)
+  }
+}
+
 async function writeScratchApp(tarballs) {
   step('write a scratch React app against the tarballs')
   await mkdir(APP, { recursive: true })
@@ -291,12 +371,19 @@ async function writeScratchApp(tarballs) {
     `import React from 'react'
 import { createRoot } from 'react-dom/client'
 import data from '${DATA}'
+import spritesheetData from '${DATA}/sets/${EMOJI_VERSION}/twitter.json'
 import Picker from '${REACT}'
 
-const supplied = !window.location.search.includes('default-data')
+const search = window.location.search
+const supplied = !search.includes('default-data')
+const spritesheet = search.includes('spritesheet')
 
 createRoot(document.getElementById('root')).render(
-  <Picker {...(supplied ? { data } : {})} onEmojiSelect={() => {}} />,
+  spritesheet ? (
+    <Picker data={spritesheetData} set="twitter" onEmojiSelect={() => {}} />
+  ) : (
+    <Picker {...(supplied ? { data } : {})} onEmojiSelect={() => {}} />
+  ),
 )
 `,
   )
@@ -622,6 +709,124 @@ async function renderWithSuppliedData(browser, origin) {
   await page.close()
 }
 
+// The sheet geometry Data ships is derived from the datasource, so deriving the
+// expectation the same way would agree with a wrong sheet. Read it back instead.
+function datasourceSheet() {
+  const data = requireFromRoot('emoji-datasource')
+  const coordinates = {}
+  let max = 0
+
+  const native = (unified) =>
+    String.fromCodePoint(...unified.split('-').map((u) => Number(`0x${u}`)))
+
+  for (const datum of data) {
+    max = Math.max(max, datum.sheet_x, datum.sheet_y)
+    coordinates[native(datum.unified)] = { x: datum.sheet_x, y: datum.sheet_y }
+
+    for (const skin in datum.skin_variations || {}) {
+      const variation = datum.skin_variations[skin]
+      max = Math.max(max, variation.sheet_x, variation.sheet_y)
+    }
+  }
+
+  return { size: max + 1, coordinates }
+}
+
+function percentages(value) {
+  const parts = String(value).trim().split(/\s+/)
+  if (parts.length !== 2 || !parts.every((part) => part.endsWith('%'))) {
+    return null
+  }
+
+  return parts.map(Number.parseFloat)
+}
+
+function readSprites(page) {
+  return page.evaluate(() => {
+    const picker = document.querySelector('em-emoji-picker')
+    const buttons = [
+      ...picker.shadowRoot.querySelectorAll('button[aria-label]'),
+    ]
+
+    return buttons
+      .map((button) => {
+        const sprite = button.querySelector('.emoji-mart-emoji span')
+        if (!sprite || !sprite.style.backgroundImage) return null
+
+        return {
+          native: button.getAttribute('aria-label'),
+          position: sprite.style.backgroundPosition,
+          size: sprite.style.backgroundSize,
+          image: sprite.style.backgroundImage,
+        }
+      })
+      .filter(Boolean)
+      .slice(0, 8)
+  })
+}
+
+async function renderSpritesheet(browser, origin) {
+  step('render a non-native Set and check where it lands on the sheet')
+
+  const page = await browser.newPage()
+  const { problems } = watch(page)
+
+  await page.goto(`${origin}?spritesheet`)
+  if (!(await mounted(page))) {
+    check(`the twitter picker mounted (${problems.join(' | ')})`, false)
+    await page.close()
+    return
+  }
+
+  const { size, coordinates } = datasourceSheet()
+  const sprites = await readSprites(page)
+  check(
+    `the twitter picker rendered sprites (${sprites.length})`,
+    !!sprites.length,
+  )
+
+  const unit = 100 / (size - 1)
+  const wrong = []
+
+  for (const sprite of sprites) {
+    const expected = coordinates[sprite.native]
+    const position = percentages(sprite.position)
+    const background = percentages(sprite.size)
+
+    if (
+      !expected ||
+      !position ||
+      !background ||
+      Math.abs(position[0] - unit * expected.x) > 0.001 ||
+      Math.abs(position[1] - unit * expected.y) > 0.001 ||
+      Math.abs(background[0] - 100 * size) > 0.001 ||
+      Math.abs(background[1] - 100 * size) > 0.001
+    ) {
+      wrong.push(`${sprite.native} at ${sprite.position} of ${sprite.size}`)
+    }
+  }
+
+  check(
+    `every sprite sits on the ${size}x${size} grid emoji-datasource describes${
+      wrong.length ? ` (${wrong.join(' | ')})` : ''
+    }`,
+    !wrong.length,
+  )
+
+  const version = await datasourceVersion()
+  const sheet = sprites[0]?.image.match(
+    /emoji-datasource-twitter@([^/]+)\/img\//,
+  )?.[1]
+  check(
+    `the rendered sheet is emoji-datasource-twitter@${version} (${sheet})`,
+    sheet === version,
+  )
+
+  check(`the page logged no errors (${problems.join(' | ')})`, !problems.length)
+
+  await page.close()
+}
+
 async function renderWithDefaultData(browser, origin) {
   step('render the picker from the published Data URL')
   const page = await browser.newPage()
@@ -666,6 +871,7 @@ async function render() {
 
   try {
     await renderWithSuppliedData(browser, origin)
+    await renderSpritesheet(browser, origin)
     if (PUBLISHED) await renderWithDefaultData(browser, origin)
   } finally {
     await browser.close()
@@ -676,6 +882,8 @@ async function render() {
 await checkSupportMatrix()
 const tarballs = await pack()
 checkCoreBundle(tarballs[CORE])
+await checkDatasourcePin()
+await checkDataReproducible()
 await writeScratchApp(tarballs)
 installScratchApp()
 checkCommonJsEntry()
