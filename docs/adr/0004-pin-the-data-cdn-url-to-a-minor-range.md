@@ -5,11 +5,16 @@ status: accepted
 # Pin the bundled Data CDN URL to a minor-version range
 
 When a consumer does not pass Data explicitly, core fetches it from jsDelivr using
-a URL baked into the bundle at build time. That URL points at
-`@quotidianlabs/emojis-data@0.1` — a range, not an exact version and not `@latest`.
-Patch releases of Data (a corrected translation, a keyword fix) then reach every
-already-published core without a core release, while a Data minor implies a real
-dataset change and requires a deliberate core bump to adopt.
+a URL baked into the bundle at build time. That URL pins
+`@quotidianlabs/emojis-data` to a minor-version range: not an exact version, and
+not `@latest`. Patch releases of Data (a corrected translation, a keyword fix)
+then reach every already-published core without a core release, while a Data minor
+implies a real dataset change and requires a deliberate core bump to adopt.
+
+Which range that is at any moment is whatever `packages/emojis/src/config.ts`
+carries, and `scripts/release-gate.mjs` holds the range it expects to find in the
+packed bundle. This decision does not name it: the range moves with those two, not
+with this file. It was `@0.1` when the decision was taken.
 
 ## Consequences
 
