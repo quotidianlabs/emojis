@@ -3,6 +3,27 @@
 Packages are versioned independently: only the package that changed gets a bump.
 See [ADR-0002](docs/adr/0002-publish-on-a-0x-version-line.md).
 
+## `@quotidianlabs/emojis-data` 0.2.1
+
+Generated against `unicode-emoji-json@0.9.0` rather than `0.4.0`. A patch, so it
+reaches every already-published core through the `@0.2` CDN range with no core
+release; see [ADR-0004](docs/adr/0004-pin-the-data-cdn-url-to-a-minor-range.md).
+
+- **Fixed:** `flag-tr` is named "Türkiye Flag" rather than "Flag Turkey", which
+  is the name `emoji-datasource@16.0.0` carries. The build prefers the
+  `unicode-emoji-json` name only when it is strictly shorter. At `0.4.0` that
+  name was `Flag Turkey`, 11 characters against the datasource's 12; at `0.9.0`
+  it is `Flag Türkiye`, which ties at 12 and no longer wins. The rule itself is
+  unchanged.
+- **Changed:** `flag-tr` gains the keyword `turkey`, so searching `turkey` still
+  finds it. The build drops keywords that already appear in the name, and
+  `turkey` no longer does.
+- Nothing else moves. `emoji-datasource` stays at 16.0.0, `emojilib` at 3.0.10
+  and `inflection` at 2.0.1, so no sprite coordinate and no other Emoji's name or
+  keywords change. `unicode-emoji-json@0.9.0` also carries 36 entries the build
+  reaches that the `0.4.0` pin lacked; none of their names is shorter than its
+  datasource counterpart, so none of them changes a name either.
+
 ## `@quotidianlabs/emojis` 0.2.0
 
 Moves to Data 0.2.0, which is a coordinated release: core cannot adopt a Data
@@ -56,8 +77,9 @@ Versions 15.1 and 16.
   upstream data; no override table is carried to preserve the old arrangement.
 - **Changed:** `flag-tr` is named "Flag Turkey" rather than "Turkey Flag". The
   datasource renamed it to "Türkiye Flag", which is longer than the name
-  `unicode-emoji-json` gives, and the build prefers the shorter of the two.
-  `unicode-emoji-json` is deliberately held at 0.4.0 in this release.
+  `unicode-emoji-json` gives at the 0.4.0 pin this release holds, and the build
+  prefers the shorter of the two. That was a regression, not intent: Data 0.2.1
+  moves the pin to 0.9.0 and restores "Türkiye Flag".
 - Keywords are unchanged: `emojilib` stays at 3.0.10. Bumping it rewrites 1707
   of 1870 keyword lists, which changes search results, and that reaches every
   published core as a Data patch without needing a core release.
