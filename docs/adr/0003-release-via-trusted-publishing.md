@@ -60,16 +60,21 @@ exact tarball if something needs inspecting first.
   suite asserts; this ADR does not fix a boundary, and nothing here reserves the
   rendered picker for the gate. CI green means prettier passed, types compiled,
   the unit suite passed with its coverage floor met, and the gate rendered.
-- **The one post-publish check that survives applies only to Data.** The `@0.1`
-  jsDelivr pin baked into every published core means a Data release becomes what
-  every default install fetches, with no core release involved, and whether
-  jsDelivr serves it cannot be known beforehand. After approving a Data release:
+- **The one post-publish check that survives applies only to Data.** The jsDelivr
+  pin baked into every published core means a Data release becomes what every
+  default install fetches, with no core release involved, and whether jsDelivr
+  serves it cannot be known beforehand. After approving a Data release, ask the
+  CDN what the range core carries resolves to now:
 
   ```sh
-  curl -sI "https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.1/sets/15/native.json" | grep x-jsd-version
+  range=$(grep -om1 '@quotidianlabs/emojis-data@[0-9.]*' packages/emojis/src/config.ts)
+  path=$(node -p "require('./packages/emojis-data/package.json').main")
+  curl -sI "https://cdn.jsdelivr.net/npm/$range/$path" | grep x-jsd-version
   ```
 
-  It should report the version just approved. See
+  It should report the version just approved. Both halves of the URL are read out
+  of the tree rather than written down here, so the check follows the range core
+  carries and the Set that Data itself points `main` at. See
   [ADR-0004](0004-pin-the-data-cdn-url-to-a-minor-range.md). This is also why Data
   must be released before core.
 - **The git tag is pushed at stage time, before approval**, because approval
