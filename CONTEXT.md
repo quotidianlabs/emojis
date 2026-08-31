@@ -50,10 +50,13 @@ _Avoid_: dataset, emoji data, index
 The single grid image every non-`native` Set is drawn from, published by
 `emoji-datasource-<set>`. Data holds each Skin's cell as `x`/`y` coordinates plus
 the grid's size, under the field name `sheet`; core builds the URL of the image
-those coordinates index into. The two are only correct together, so Data names the
-`emoji-datasource` version it was built against in `datasourceVersion` and core
-builds the URL from that. See
-[ADR-0008](docs/adr/0008-derive-the-datasource-version-from-data.md).
+those coordinates index into. The two are only correct together, and
+[ADR-0008](docs/adr/0008-derive-the-datasource-version-from-data.md) settles how they
+are kept that way: Data names the `emoji-datasource` version it was built against in
+`datasourceVersion`, and core builds the URL from that, keeping an exact version
+literal as the fallback for Data that does not carry the field. That is the accepted
+decision, not yet the code: core today holds only the literal, and nothing relates it
+to Data's coordinates. Implemented by #48.
 _Avoid_: sprite map, atlas. Bare "sheet" names the geometry, not the image.
 
 **Custom Emoji**:
