@@ -72,6 +72,7 @@ export interface PickerData {
   emojis: { [id: string]: PickerEmoji }
   aliases: { [alias: string]: string }
   sheet: { cols: number; rows: number }
+  datasourceVersion?: string
 }
 
 export interface PickerI18n {

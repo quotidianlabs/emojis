@@ -3,6 +3,7 @@ export interface EmojiMartData {
   emojis: { [key: string]: Emoji }
   aliases: { [key: string]: string }
   sheet: Sheet
+  datasourceVersion?: string
 }
 
 export interface Category {

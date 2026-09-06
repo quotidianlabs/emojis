@@ -30,6 +30,15 @@ export const suppliedData = (supplied: EmojiMartData): EmojiPickerProps => ({
   data: supplied,
 })
 
+export const declaredDatasourceVersion = (
+  supplied: EmojiMartData,
+): string | undefined => supplied.datasourceVersion
+
+export const dataWithDatasourceVersion: PickerData = {
+  ...data,
+  datasourceVersion: '16.0.0',
+}
+
 export const bundledSatisfiesPickerData: PickerData = bundledData
 
 export const valid: EmojiPickerProps = {

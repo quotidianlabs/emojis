@@ -155,8 +155,10 @@ module.exports = {
   // The test environment that will be used for testing
   testEnvironment: 'jest-environment-jsdom',
 
-  // Options that will be passed to the testEnvironment
-  // testEnvironmentOptions: {},
+  // jsdom's `browser` condition resolves preact to an ES module Jest cannot load.
+  testEnvironmentOptions: {
+    customExportConditions: ['node', 'require', 'default'],
+  },
 
   // Adds a location field to test results
   // testLocationInResults: false,
