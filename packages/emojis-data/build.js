@@ -5,6 +5,8 @@ const emojiLib = require('emojilib')
 const emojiData = require('emoji-datasource')
 const unicodeEmoji = require('unicode-emoji-json')
 
+const DATASOURCE_VERSION = require('emoji-datasource/package.json').version
+
 const DRY_RUN = process.argv.indexOf('--dry') != -1
 
 const VERSIONS = [1, 2, 3, 4, 5, 11, 12, 12.1, 13, 13.1, 14, 15, 15.1, 16]
@@ -59,6 +61,7 @@ function buildData({ set, version } = {}) {
     emojis: {},
     aliases: {},
     sheet: { ...SHEET },
+    datasourceVersion: DATASOURCE_VERSION,
   }
 
   CATEGORIES.forEach((category, i) => {

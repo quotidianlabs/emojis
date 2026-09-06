@@ -18,7 +18,7 @@ const CORE = '@quotidianlabs/emojis'
 const DATA = '@quotidianlabs/emojis-data'
 const REACT = '@quotidianlabs/emojis-react'
 
-const DATA_CDN = 'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.2'
+const DATA_CDN = 'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.3'
 
 // Named, not matched: a pattern would pass on a tarball missing the newest Set.
 const EMOJI_VERSION = '16'
@@ -269,8 +269,8 @@ async function datasourceVersion() {
   return manifest.devDependencies['emoji-datasource']
 }
 
-// Two manifests that no build step relates. See ADR-0008.
-async function checkDatasourcePin() {
+// Nothing in the packages relates the fallback literal to Data. See ADR-0008.
+async function checkDatasourcePin(dataTarball) {
   step('check core and Data agree on an emoji-datasource version')
 
   const version = await datasourceVersion()
@@ -281,8 +281,21 @@ async function checkDatasourcePin() {
   const pinned = source.match(/DATASOURCE_VERSION = '([^']+)'/)?.[1]
 
   check(
-    `core pins emoji-datasource ${pinned} and Data builds against ${version}`,
+    `core falls back to emoji-datasource ${pinned} and Data builds against ${version}`,
     !!version && pinned === version,
+  )
+
+  const set = JSON.parse(
+    capture('tar', [
+      '-xzOf',
+      dataTarball,
+      `package/sets/${EMOJI_VERSION}/native.json`,
+    ]),
+  )
+
+  check(
+    `the packed Data declares datasourceVersion ${set.datasourceVersion}`,
+    !!version && set.datasourceVersion === version,
   )
 }
 
@@ -404,6 +417,26 @@ import EmojiPicker, {
 } from '${REACT}'
 
 export type Data = EmojiMartData
+
+// Optional, permanently: Data a consumer writes by hand still has to satisfy
+// the type. See ADR-0008.
+export const handRolled: EmojiMartData = {
+  categories: [{ id: 'people', emojis: ['+1'] }],
+  emojis: {
+    '+1': {
+      id: '+1',
+      name: 'Thumbs Up',
+      keywords: ['approve'],
+      skins: [{ unified: '1f44d', native: '\u{1f44d}' }],
+      version: 1,
+    },
+  },
+  aliases: { thumbsup: '+1' },
+  sheet: { cols: 62, rows: 62 },
+}
+
+export const declaredDatasourceVersion: string | undefined =
+  bundledData.datasourceVersion
 
 // The import every README shows. It only type-checks if the packed Data
 // declares a default export, which it did not until emojis-data 0.1.1.
@@ -883,7 +916,7 @@ async function render() {
 await checkSupportMatrix()
 const tarballs = await pack()
 checkCoreBundle(tarballs[CORE])
-await checkDatasourcePin()
+await checkDatasourcePin(tarballs[DATA])
 await checkDataReproducible()
 await writeScratchApp(tarballs)
 installScratchApp()

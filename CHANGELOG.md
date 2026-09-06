@@ -3,6 +3,62 @@
 Packages are versioned independently: only the package that changed gets a bump.
 See [ADR-0002](docs/adr/0002-publish-on-a-0x-version-line.md).
 
+## `@quotidianlabs/emojis-react` 0.4.0
+
+- **Added:** `PickerData` declares `datasourceVersion?: string`, matching
+  `EmojiMartData`. Without it a consumer passing an inline Data object literal
+  that carries the field hits TypeScript's excess property check on the type
+  this wrapper's own README points them at.
+
+## `@quotidianlabs/emojis` 0.3.0
+
+Builds both image URLs from the `emoji-datasource` version Data declares rather
+than from a literal of its own. A mismatched core and Data pairing used to draw
+every non-`native` Emoji from the wrong cell of the Spritesheet with no error
+and no warning; now the coordinates and the image they index into come from the
+same place. See
+[ADR-0008](docs/adr/0008-derive-the-datasource-version-from-data.md).
+
+This does not end the coordinated release. Sprite coordinates move on a Data
+minor and the bundled Data URL stays on a minor range, so adopting a rebuilt
+dataset still costs a core release to widen that range, per
+[ADR-0004](docs/adr/0004-pin-the-data-cdn-url-to-a-minor-range.md). What it
+removes is the silent mismatch, not the release coupling.
+
+- **Added:** the Spritesheet URL and the per-Emoji PNG URL are built from
+  `datasourceVersion` in the Data supplied, when it carries the field and the
+  value is a bare version. Data at 0.3.0 and later carries it.
+- **Added:** one `console.warn`, at most once per page, when core falls back to
+  its own literal because the Data supplied declares no usable version. Hand
+  rolled Data still renders; it is only told that the images it gets are
+  whatever `16.0.0` holds. A malformed value takes the same path as a missing
+  one, so a version can never reach outside its path segment in the URL.
+- **Changed:** `16.0.0` is now a fallback rather than the pin. It still ships
+  and still has to be right, and the release gate still checks it against the
+  `emoji-datasource` Data builds against.
+- **Changed:** the default Data URL widens to
+  `https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.3` on both the Set
+  and i18n paths, per
+  [ADR-0004](docs/adr/0004-pin-the-data-cdn-url-to-a-minor-range.md). Without
+  this a default consumer never receives Data carrying the field.
+- Nothing changes for a consumer who passes `getSpritesheetURL`. That callback
+  owns the URL, is not given the version, and does not trigger the warning.
+
+## `@quotidianlabs/emojis-data` 0.3.0
+
+- **Added:** every Set file carries `datasourceVersion`, the `emoji-datasource`
+  version the build actually resolved, and `EmojiMartData` declares it as
+  `datasourceVersion?: string`. Core reads it to build the Spritesheet and
+  per-Emoji image URLs, so Data's coordinates and the image they index into no
+  longer depend on the consumer having paired the two packages correctly. See
+  [ADR-0008](docs/adr/0008-derive-the-datasource-version-from-data.md).
+- The field is optional permanently. `EmojiMartData` is on the Compatibility
+  Surface, so requiring it would break a consumer who writes their own Data and
+  types it as `EmojiMartData`.
+- Nothing else moves. `emoji-datasource` stays at 16.0.0, so no sprite
+  coordinate, name or keyword changes; a minor rather than a patch only because
+  the field is new.
+
 ## `@quotidianlabs/emojis-data` 0.2.1
 
 Generated against `unicode-emoji-json@0.9.0` rather than `0.4.0`. A patch, so it

@@ -54,9 +54,7 @@ those coordinates index into. The two are only correct together, and
 [ADR-0008](docs/adr/0008-derive-the-datasource-version-from-data.md) settles how they
 are kept that way: Data names the `emoji-datasource` version it was built against in
 `datasourceVersion`, and core builds the URL from that, keeping an exact version
-literal as the fallback for Data that does not carry the field. That is the accepted
-decision, not yet the code: core today holds only the literal, and nothing relates it
-to Data's coordinates. Implemented by #48.
+literal as the fallback for Data that does not carry the field.
 _Avoid_: sprite map, atlas. Bare "sheet" names the geometry, not the image.
 
 **Custom Emoji**:
