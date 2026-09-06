@@ -44,7 +44,7 @@ import { Picker } from '@quotidianlabs/emojis'
 new Picker({
   data: async () => {
     const response = await fetch(
-      'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data',
+      'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.2/sets/16/native.json',
     )
 
     return response.json()
