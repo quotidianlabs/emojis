@@ -43,7 +43,7 @@ import { Picker } from '@quotidianlabs/emojis'
 new Picker({
   data: async () => {
     const response = await fetch(
-      'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data',
+      'https://cdn.jsdelivr.net/npm/@quotidianlabs/emojis-data@0.2/sets/16/native.json',
     )
 
     return response.json()
@@ -52,6 +52,8 @@ new Picker({
 ```
 
 In this example data is fetched from a content delivery network, but it could also be fetched from your own domain if you want to host the data.
+
+The URL is pinned deliberately: `@0.2` is the Data range this version of the picker expects, and `sets/16/native.json` names one Emoji Version and one Set. Those last two segments must match the `emojiVersion` and `set` you pass to the picker, so change them together if you change either.
 
 ## 🏪 Picker
 ### React
