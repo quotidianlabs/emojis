@@ -155,8 +155,7 @@ module.exports = {
   // The test environment that will be used for testing
   testEnvironment: 'jest-environment-jsdom',
 
-  // jsdom asks for the `browser` export condition, which resolves preact to an
-  // ES module Jest cannot load. Node's conditions give the CommonJS build.
+  // jsdom's `browser` condition resolves preact to an ES module Jest cannot load.
   testEnvironmentOptions: {
     customExportConditions: ['node', 'require', 'default'],
   },

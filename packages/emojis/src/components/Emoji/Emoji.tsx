@@ -23,7 +23,7 @@ function resolveDatasourceVersion() {
   if (!warnedAboutFallback) {
     warnedAboutFallback = true
     console.warn(
-      `[EmojiMart] The data supplied does not declare the emoji-datasource version it was built against, so images fall back to ${DATASOURCE_VERSION}. Sprites built against another version will be drawn from the wrong cell.`,
+      `[EmojiMart] The data supplied declares no usable emoji-datasource version, so images fall back to ${DATASOURCE_VERSION}. Sprites built against another version will be drawn from the wrong cell.`,
     )
   }
 
@@ -50,23 +50,18 @@ export default function Emoji(props) {
 
   const emojiSkin = emoji.skins[skin - 1] || emoji.skins[0]
 
-  // Lazy and memoised: a consumer who supplies both URLs resolves nothing.
-  let version
-  const datasourceVersion = () =>
-    version || (version = resolveDatasourceVersion())
-
   const imageSrc =
     emojiSkin.src ||
     (props.set != 'native' && !props.spritesheet
       ? typeof props.getImageURL === 'function'
         ? props.getImageURL(props.set, emojiSkin.unified)
-        : `https://cdn.jsdelivr.net/npm/emoji-datasource-${props.set}@${datasourceVersion()}/img/${props.set}/64/${emojiSkin.unified}.png`
+        : `https://cdn.jsdelivr.net/npm/emoji-datasource-${props.set}@${resolveDatasourceVersion()}/img/${props.set}/64/${emojiSkin.unified}.png`
       : undefined)
 
   const spritesheetSrc = () =>
     typeof props.getSpritesheetURL === 'function'
       ? props.getSpritesheetURL(props.set)
-      : `https://cdn.jsdelivr.net/npm/emoji-datasource-${props.set}@${datasourceVersion()}/img/${props.set}/sheets-256/64.png`
+      : `https://cdn.jsdelivr.net/npm/emoji-datasource-${props.set}@${resolveDatasourceVersion()}/img/${props.set}/sheets-256/64.png`
 
   return (
     <span class="emoji-mart-emoji" data-emoji-set={props.set}>

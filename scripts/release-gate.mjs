@@ -270,7 +270,7 @@ async function datasourceVersion() {
 }
 
 // Nothing in the packages relates the fallback literal to Data. See ADR-0008.
-async function checkDatasourcePin(dataTarball) {
+async function checkDatasourceFallback(dataTarball) {
   step('check core and Data agree on an emoji-datasource version')
 
   const version = await datasourceVersion()
@@ -418,8 +418,7 @@ import EmojiPicker, {
 
 export type Data = EmojiMartData
 
-// Optional, permanently: Data a consumer writes by hand still has to satisfy
-// the type. See ADR-0008.
+// Optional, permanently, both ways round. See ADR-0008.
 export const handRolled: EmojiMartData = {
   categories: [{ id: 'people', emojis: ['+1'] }],
   emojis: {
@@ -433,6 +432,11 @@ export const handRolled: EmojiMartData = {
   },
   aliases: { thumbsup: '+1' },
   sheet: { cols: 62, rows: 62 },
+}
+
+export const handRolledWithVersion: EmojiMartData = {
+  ...handRolled,
+  datasourceVersion: '16.0.0',
 }
 
 export const declaredDatasourceVersion: string | undefined =
@@ -916,7 +920,7 @@ async function render() {
 await checkSupportMatrix()
 const tarballs = await pack()
 checkCoreBundle(tarballs[CORE])
-await checkDatasourcePin(tarballs[DATA])
+await checkDatasourceFallback(tarballs[DATA])
 await checkDataReproducible()
 await writeScratchApp(tarballs)
 installScratchApp()

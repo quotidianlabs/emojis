@@ -66,7 +66,7 @@ describe('Emoji image URLs', () => {
     expect(warn).not.toHaveBeenCalled()
   })
 
-  test('falls back to the pinned version when Data declares none', async () => {
+  test('falls back to its own version when Data declares none', async () => {
     await setup(dataFixture())
 
     expect(imageURL(renderEmoji())).toBe(
